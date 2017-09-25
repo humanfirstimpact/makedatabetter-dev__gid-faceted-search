@@ -1,0 +1,174 @@
+<!--
+  Wrapper component for concepts
+-->
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../gid-api/gid-api.html">
+<link rel="import" href="../gid-concept-details/gid-concept-details.html">
+<!--
+`gid-faceted-search`
+
+A data component for faceted search
+
+    <gid-faceted-search></gid-faceted-search>
+    
+The fields 'concept' and 'user' are mandatory.
+
+The property '' returns the response against the rest call.
+
+If 'apiUrl' is not provided, then the component would fetch sample data from mock json.
+
+API endpoint:
+
+    
+Input:
+
+
+Sample Input: (Query params)
+
+
+Output:
+
+
+
+The output of this components will be as follows:
+
+	    
+
+@demo demo/index.html
+-->
+<dom-module id="gid-faceted-search">
+  <template>
+          <!-- fetch concept details  -->
+        	<gid-concept-details user='1' api-url='{{apiUrl}}'
+	        concept='{{concept}}' api-token = '{{apiToken}}'
+	        conceptdetails='{{conceptdetails}}'>
+	        </gid-concept-details>
+         <!--  fetch concept details -->
+        
+       
+
+  </template>
+  <script>
+    (function() {
+     'use strict';
+      Polymer({
+        is:'gid-faceted-search',
+        properties:{
+	           /*Authorization token for accessing rest api*/
+	        	apiToken: {
+	            	type: String,
+	                notify: true,
+	                value : ''
+	            },
+	            /*Base url*/
+	        	apiUrl:{
+	            	type: String,
+	    	        notify: true,
+	    	        value: ''
+	    	 	},
+	    	   /*Url*/
+        	   _facetedSearchUrl:{
+                	type: String,
+        	        notify: true
+        	 	},
+        	 	/*Params*/
+     	   	    _facetedSearchParams : {
+     	   	    	type: String,
+     	   	    	notify: true
+     	   	    },
+     	   		/*Timeout*/
+        	 	_facetedSearchTimeout : {
+            		type: Number,
+        	        notify: true,
+        	        value : 0
+        	    },
+     	   	    /*Token*/
+     	   	    _facetedSearchToken : {
+     	   	    	type: String,
+     	   	    	notify: true
+     	   	    },
+     	   	    /*Array for storing concept details*/
+     	   	    conceptdetails: {
+     	          type: Array,
+     	          value: [],
+     	          notify: true,
+     	          observer: '_conceptDetailsArrObserver'
+     	        },
+     	        /*User Id*/
+     	       	user: {
+     	        	type: String,
+     	        	value : '',
+     	        	notify :  true
+     	        },
+     	        /*Concept Id*/
+     	       	concept:{
+     	    	  type: String,
+	   	          value : '',
+	   	          notify :  true
+     	       },
+     	      /*The api path key*/
+	           _pathKey: {
+	            	type: String,
+	                notify: true,
+	                value: ''
+	           },
+	           /*The api path*/
+               _path: {
+               	   type: String,
+                   notify: true,
+                   value: '',
+                   observer: '_pathReceived'
+               },
+               /*Api entity sent to gid-api*/
+               _apiEntity: {
+               	   type: String,
+                   notify: true
+               }
+        },
+         /* Reset method */
+         _reset: function () {
+        	 this.conceptdetails = [];
+      		 this._apiEntity = '';
+             this._path = '';
+         },
+         /* Observer of concept details array */
+         _conceptDetailsArrObserver: function () {
+        	 if (this.conceptdetails) {
+        	 	if(this.conceptdetails.exampleColumns.length > 0){
+        	 		if (!this.apiUrl) {
+    	      			this._facetedSearchUrl = this.importPath + 'assets/json/concept-details.json';
+    	                this._facetedSearchTimeout =  this._facetedSearchTimeout - 1;
+          			}
+            		else {
+            			this._pathKey =  'default';
+             			this._apiEntity = 'FACETED-COLUMNS';
+             		}
+        	 	}
+         	}
+				
+         },
+         /* Observer for api path */
+         _pathReceived: function(){
+         	if(this._path){
+         		var res = this._path.split(/{([^}]+)}/);
+         		for (var i in res) {
+         			if(!res[i].startsWith("/")){
+         					if(this[res[i]]){
+         						res[i] = this[res[i]];
+         					}
+         			}
+         		}
+       			this._facetedSearchUrl = this.apiUrl + res.join("");
+       			this._facetedSearchParams = this.params= JSON.stringify({
+	        	  "near": this.conceptdetails.label});
+       			if(this.apiToken){
+       				this._facetedSearchToken =  this.apiToken;
+       			}
+       			this._facetedSearchTimeout =  this._facetedSearchTimeout - 1;
+         		
+         	}
+         }
+      });
+    })();
+  </script>
+</dom-module>
