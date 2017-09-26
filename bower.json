@@ -16,7 +16,8 @@
     "web-component-tester": "^4.0.0",
     "webcomponentsjs": "webcomponents/webcomponentsjs#^0.7.0",
     "gid-api": "makedatabetter-dev/gid-api",
-    "gid-concept-details": "makedatabetter-dev/gid-concept-details"
+	"gid-concept-details" : "makedatabetter-dev/gid-concept-details",
+	"gid-faceted-search" : "makedatabetter-dev/gid-faceted-search"
   },
   "resolutions": {
     "lodash": "4.17.4"
