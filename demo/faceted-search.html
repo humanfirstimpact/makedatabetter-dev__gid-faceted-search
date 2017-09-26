@@ -1,0 +1,66 @@
+<link rel="import" href="../gid-faceted-search.html">
+
+<dom-module id="faceted-search">
+  <template>
+  		<style>
+	  	table, th, td {
+	    border: 1px solid grey;
+	    border-collapse: collapse;
+		}
+		td {
+		    text-align: center;
+		}
+  		</style>
+  		<h1>Faceted Search Details</h1>
+        <gid-faceted-search user='1'
+        api-url='http://srv-34-197-77-167.globalids.com:45450/api/v1'
+        api-token = 'MTAxMDUwMTY0MTUwNjQyMDg5NTE2NDA5MDFY'
+        concept='-8063219885805257497' conceptdetails={{conceptdetails}}>
+        </gid-faceted-search>
+        
+        <gid-faceted-search user='1'
+        api-url='http://srv-34-197-77-167.globalids.com:45450/api/v1'
+        api-token = 'MTAxMDUwMTY0MTUwNjQyMDg5NTE2NDA5MDFY'
+        synonyms='FirstName' patterns='["Zzzz"]' mode="EXPLORE"
+        trigger-filter={{triggerFilter}}
+        response={{response}}>
+        </gid-faceted-search>
+        
+  </template>
+  <script>
+    (function() {
+     'use strict';
+      Polymer({
+        is:'faceted-search',
+        properties:{
+        	conceptdetails: {
+   	          type: Array,
+   	          value: [],
+   	          notify: true,
+   	          observer: 'conceptDetailsObserver'
+   	        },
+   	        isConceptDetailsReceived: {
+   	        	type: Boolean,
+   	        	value: false
+   	        },
+   	        triggerFilter: {
+	   		  type: Boolean,
+	   		  notify: true,
+	   		  value: false
+   	        }
+        },
+        conceptDetailsObserver: function () {
+        	 if(this.conceptdetails.length > 0){	
+				if(this.conceptdetails[0]['errorCode']){
+					this.isConceptDetailsReceived = false;
+				}
+				else{
+					this.isConceptDetailsReceived =  true;
+					this.triggerFilter =  true;
+				}
+        	 }
+         }
+      });
+    })();
+  </script>
+</dom-module>
