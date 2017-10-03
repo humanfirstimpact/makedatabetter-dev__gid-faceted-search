@@ -553,7 +553,7 @@ Note: The inputs marked with '*' are mandatory inputs.
         		  type: Boolean,
         		  notify: true,
         		  value: false,
-        		  observer: '__observeTriggerFilter'
+        		  observer: '_observeTriggerFilter'
 	            },
 	           /*Authorization token for accessing rest api*/
 	        	apiToken: {
@@ -739,7 +739,7 @@ Note: The inputs marked with '*' are mandatory inputs.
              	
           },
           /*Observer of 'triggerFilter' flag*/
-          __observeTriggerFilter:  function(){
+          _observeTriggerFilter:  function(){
         	  if(this.triggerFilter){
                   for (var i in this._paramsArr){
                   	if(this[this._paramsArr[i]].length > 0){
