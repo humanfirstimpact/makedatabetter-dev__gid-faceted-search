@@ -463,9 +463,9 @@ Note: The inputs marked with '*' are mandatory inputs.
 	        </gid-concept-details>
          <!--  fetch concept details -->
         
-         <!-- fetch entity _path  -->
+         <!-- fetch entity path  -->
         	<gid-api entity = '{{_apiEntity}}' path-key= '{{_pathKey}}' path='{{_path}}'></gid-api>
-         <!--  fetch entity _path -->
+         <!--  fetch entity path -->
         
          <!-- fetch nearby columns -->	
 			<gid-api auto=false
@@ -665,8 +665,8 @@ Note: The inputs marked with '*' are mandatory inputs.
         			 that._conceptLabel =  i.label;
         			 if(i.exampleColumns.length === 0){
         				 if (!that.apiUrl) {
-        					 that._facetedSearchUrl = this.importPath + 'assets/json/concept-details.json';
-        					 that._facetedSearchTimeout =  this._facetedSearchTimeout - 1;
+        					 that._facetedSearchUrl = that.importPath + 'assets/json/concept-details.json';
+        					 that._facetedSearchTimeout =  that._facetedSearchTimeout - 1;
                			}
                  		else {
                  			that._fetchNear =  true;
