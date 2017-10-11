@@ -46,10 +46,12 @@
   		<paper-input label="Api Url" value={{apiUrl}} id="apiUrl"></paper-input>
   		<paper-input label="Api Token" value={{apiToken}} id="apiToken"></paper-input>
   		
-  		<gid-list-concepts  api-url={{apiUrl}}
-	    api-token={{apiToken}} user='1' 
-        limit = '1000' offset = '0'
-        concepts='{{concepts}}'></gid-list-concepts>
+  		 <template is="dom-if" if="[[apiToken]]">
+	  		<gid-list-concepts  api-url={{apiUrl}}
+		    api-token={{apiToken}} user='1' 
+	        limit = '1000' offset = '0'
+	        concepts='{{concepts}}'></gid-list-concepts>
+        </template>
         
          <template is="dom-if" if="[[_isConceptsReceived]]">
 			<select style="width: 200px;">
@@ -246,12 +248,12 @@
    	        apiUrl: {
    	       	  type: String,
   	   		  notify: true,
-  	   		  value: 'https://protect-lab.globalids.com/api/v1'
+  	   		  value: ''
    	        },
    	     	apiToken: {
   	       	  type: String,
  	   		  notify: true,
- 	   		  value: 'MTAxMDUwMTY0MTUwNzYzMjgxODEzODA5MDFY'
+ 	   		  value: ''
   	        },
   	        _fetchConceptDetails: {
   	          type: Boolean,
