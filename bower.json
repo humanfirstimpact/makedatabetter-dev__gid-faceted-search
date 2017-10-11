@@ -8,6 +8,7 @@
     "polymer": "Polymer/polymer#^1.6.0",
     "iron-ajax": "PolymerElements/iron-ajax#^1.4.4",
     "polymer-global-variables": "1.1.0",
+    "jquery": "2.2.0",
     "lodash": "4.17.4"
   },
   "devDependencies": {
@@ -17,9 +18,14 @@
     "webcomponentsjs": "webcomponents/webcomponentsjs#^0.7.0",
     "gid-api": "makedatabetter-dev/gid-api",
 	"gid-concept-details" : "makedatabetter-dev/gid-concept-details",
-	"gid-faceted-search" : "makedatabetter-dev/gid-faceted-search"
+	"gid-faceted-search" : "makedatabetter-dev/gid-faceted-search",
+	"gid-list-concepts": "makedatabetter-dev/gid-list-concepts",
+	"paper-input": "PolymerElements/paper-input#^2.0.2",
+    "paper-button": "PolymerElements/paper-button#^2.0.0",
+    "paper-checkbox": "PolymerElements/paper-checkbox#^2.0.1"
   },
   "resolutions": {
-    "lodash": "4.17.4"
+    "lodash": "4.17.4",
+    "paper-button": "^1.0.0"
   }
 }
