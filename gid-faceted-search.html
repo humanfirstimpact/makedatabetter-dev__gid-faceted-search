@@ -513,7 +513,7 @@ Note: The inputs marked with '*' are mandatory inputs.
 	                notify: true,
 	                value : 'EXPLORE'
               },
-        	  /*Array for synonyms parameter*/ 
+        	  /*String for synonyms parameter*/ 
 	  	       synonyms: {
 		           	   type: String,
 		           	   notify: true,
@@ -648,7 +648,7 @@ Note: The inputs marked with '*' are mandatory inputs.
         
          /* Reset method */
          _reset: function () {
-        	 this.conceptdetails = [];
+        	// this.conceptdetails = [];
         	 this.response = [];
         	 this.triggerFilter = false;
         	 this._fetchNear =  false;
@@ -680,7 +680,7 @@ Note: The inputs marked with '*' are mandatory inputs.
          	}
 				
          },
-         /*Set pathkey  and entity for faceted column search*/
+         /* Set pathkey  and entity for faceted column search */
          _set: function(){
         	 this._pathKey =  'default';
    			 this._apiEntity = 'FACETED-COLUMNS';
@@ -700,19 +700,25 @@ Note: The inputs marked with '*' are mandatory inputs.
        			if(this._fetchNear){
        				this._facetedSearchParams = JSON.stringify({
       	        	  "near": this._conceptLabel});
+       				this._setAttributes();
        			}
        			else{
-       				this._facetedSearchParams = JSON.stringify({
-      	        	  "filter": this._paramVal}); 
+       				if(this._paramVal){
+       					this._facetedSearchParams = JSON.stringify({
+            	        	  "filter": this._paramVal}); 
+       					this._setAttributes();
+       				}
        			}
-       			if(this.apiToken){
-       				this._facetedSearchToken =  this.apiToken;
-       			}
-       			this._facetedSearchTimeout =  this._facetedSearchTimeout - 1;
-         		
+       			
          	}
          },
-         
+         /* Set timeout and token */
+         _setAttributes: function(){
+        	 if(this.apiToken){
+    				this._facetedSearchToken =  this.apiToken;
+    			}
+    			this._facetedSearchTimeout =  this._facetedSearchTimeout - 1;
+         },
          /* Example columns success response handler */
          _facetedSearchResponseReceived : function(newvalue, oldvalue){
          	 this._reset();
