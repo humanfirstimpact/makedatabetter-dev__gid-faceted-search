@@ -118,47 +118,48 @@
     <template is="dom-if" if="![[isConceptDetailsReceived]]">
             <p>{{conceptdetails.0.userMessage}}</p>
     </template>
-    	
-    <template is="dom-repeat" items="[[_facetedSearchPropertiesArr]]">
-            <div class="horizontal-section">
-                <table style="width:100%">
-				  <tr>
-				    <th>Synonyms</th>
-				    <th>Patterns</th>
-				    <th>Related Concepts</th>
-				    <th>Example Values</th>
-				    <th>Example Columns</th>
-				  </tr>
-				  <tr>
-				    <td valign="top">
-				     <template is="dom-repeat" items="[[item.synonyms]]">
-				     	<p><paper-checkbox on-click="_check" name="synonyms" value="{{item.label}}">{{item.label}}</paper-checkbox></p>
-				     </template>
-				    </td>
-				    <td valign="top">
-				     <template is="dom-repeat" items="[[item.patterns]]">
-				     	<p><paper-checkbox on-click="_check" name="patterns" value="{{item.label}}">{{item.label}}</paper-checkbox></p>
-				     </template>
-				    </td>
-				    <td valign="top">
-				     <template is="dom-repeat" items="[[item.relatedDomains]]">
-				     	<p><paper-checkbox on-click="_check" name="relatedDomains" value="{{item.label}}">{{item.label}}</paper-checkbox></p>
-				     </template>
-				    </td>
-				    <td valign="top">
-				     <template is="dom-repeat" items="[[item.exampleValues]]">
-				     	<p><paper-checkbox on-click="_check" name="values" value="{{item.label}}">{{item.label}}</paper-checkbox></p>
-				     </template>
-				    </td>
-				    <td valign="top">
-				     <template is="dom-repeat" items="[[item.exampleColumns]]">
-				     	<p><paper-checkbox on-click="_check" name="columns" value="{{item.label}}">{{item.label}}</paper-checkbox></p>
-				     </template>
-				    </td>
-				    
-				  </tr>
-				</table>
-            </div>
+    <template is="dom-if" if="[[_isResponseReceived]]">	
+	    <template is="dom-repeat" items="[[_facetedSearchPropertiesArr]]">
+	            <div class="horizontal-section">
+	                <table style="width:100%">
+					  <tr>
+					    <th>Synonyms</th>
+					    <th>Patterns</th>
+					    <th>Related Concepts</th>
+					    <th>Example Values</th>
+					    <th>Example Columns</th>
+					  </tr>
+					  <tr>
+					    <td valign="top">
+					     <template is="dom-repeat" items="[[item.synonyms]]">
+					     	<p><paper-checkbox on-click="_check" name="synonyms" value="{{item.label}}">{{item.label}}</paper-checkbox></p>
+					     </template>
+					    </td>
+					    <td valign="top">
+					     <template is="dom-repeat" items="[[item.patterns]]">
+					     	<p><paper-checkbox on-click="_check" name="patterns" value="{{item.label}}">{{item.label}}</paper-checkbox></p>
+					     </template>
+					    </td>
+					    <td valign="top">
+					     <template is="dom-repeat" items="[[item.relatedDomains]]">
+					     	<p><paper-checkbox on-click="_check" name="relatedDomains" value="{{item.label}}">{{item.label}}</paper-checkbox></p>
+					     </template>
+					    </td>
+					    <td valign="top">
+					     <template is="dom-repeat" items="[[item.exampleValues]]">
+					     	<p><paper-checkbox on-click="_check" name="values" value="{{item.label}}">{{item.label}}</paper-checkbox></p>
+					     </template>
+					    </td>
+					    <td valign="top">
+					     <template is="dom-repeat" items="[[item.exampleColumns]]">
+					     	<p><paper-checkbox on-click="_check" name="columns" value="{{item.label}}">{{item.label}}</paper-checkbox></p>
+					     </template>
+					    </td>
+					    
+					  </tr>
+					</table>
+	            </div>
+	        </template>
         </template>
         
         <p></p>
@@ -311,7 +312,12 @@
         	   type: String,
            	   notify: true,
            	   value: ''  
-           }
+           },
+           _isResponseReceived:{
+         	  type: Boolean,
+   	   		  notify: true,
+   	   		  value: false
+            }
 	           
         },
         _conceptsListObserver: function(){
@@ -344,8 +350,10 @@
          _responseObserver: function () {
         	 if(this.response.length > 0){	
  				if(this.response[0]['errorCode']){
+ 					this._isResponseReceived = false;
  				}
  				else{
+ 					this._isResponseReceived = true;
  					if(!this._facetedSearchPerformed){
  						this._facetedSearchPropertiesArr = this._facetedSearchPropertiesArr.concat(this.response);
  					}
@@ -357,6 +365,10 @@
          	 }
          },
          _submit: function(){
+        	 this.isConceptDetailsReceived = false;
+        	 this._isResponseReceived = false;
+        	 this._facetedSearchPerformed = false;
+        	 this.concept = '';
         	 this.apiUrl = $("#apiUrl").val();
         	 this.apiToken = $("#apiToken").val();
         	 this.concept = $('select option:selected').val();
