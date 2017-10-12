@@ -30,11 +30,11 @@
     "paper-button": "^1.0.0"
   },
   "homepage": "https://github.com/makedatabetter-dev/gid-faceted-search",
-  "_release": "0ac0b9d67a",
+  "_release": "614c51544c",
   "_resolution": {
     "type": "branch",
     "branch": "master",
-    "commit": "0ac0b9d67a09ee63d0b523bc7659921b55c993cf"
+    "commit": "614c51544c5ba4c03d4d52dbf5833881f1ff7d07"
   },
   "_source": "https://github.com/makedatabetter-dev/gid-faceted-search.git",
   "_target": "*",

@@ -745,9 +745,10 @@ Note: The inputs marked with '*' are mandatory inputs.
           _observeTriggerFilter:  function(){
         	  if(this.triggerFilter){
         		  this._paramVal = '';
+        		  var j = 0;
                   for (var i in this._paramsArr){
                   	if(this[this._paramsArr[i]].length > 0){
-                  			if(i>0 && this[this._paramsArr[i-1]].length > 0){
+                  			if(j>0){
                   				this._paramVal = this._paramVal + " and " + "(";
                   			}
           		    		if(this._paramsArr[i] === "synonyms"){
@@ -769,10 +770,12 @@ Note: The inputs marked with '*' are mandatory inputs.
 //           		    			}
       		    				this._paramVal = this._paramVal + "['" + this[this._paramsArr[i]].join("','")+ "']";
       		    			}
-      		    			if(i>0 && this[this._paramsArr[i-1]].length > 0){
+      		    			if(j>0){
       		    				this._paramVal = this._paramVal + ')';
       		    			}
+      		    			j = j+1;
                   	}
+                  	
                   }
                   this._set();
         	  }
