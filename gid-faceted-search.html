@@ -682,6 +682,8 @@ Note: The inputs marked with '*' are mandatory inputs.
          },
          /* Set pathkey  and entity for faceted column search */
          _set: function(){
+        	 this._apiEntity = '';
+             this._path = '';
         	 this._pathKey =  'default';
    			 this._apiEntity = 'FACETED-COLUMNS';
          },
@@ -742,9 +744,10 @@ Note: The inputs marked with '*' are mandatory inputs.
           /*Observer of 'triggerFilter' flag*/
           _observeTriggerFilter:  function(){
         	  if(this.triggerFilter){
+        		  this._paramVal = '';
                   for (var i in this._paramsArr){
                   	if(this[this._paramsArr[i]].length > 0){
-                  			if(i>0){
+                  			if(i>0 && this[this._paramsArr[i-1]].length > 0){
                   				this._paramVal = this._paramVal + " and " + "(";
                   			}
           		    		if(this._paramsArr[i] === "synonyms"){

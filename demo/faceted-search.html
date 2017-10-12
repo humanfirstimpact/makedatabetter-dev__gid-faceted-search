@@ -2,6 +2,9 @@
 <link rel="import" href="../../paper-input/paper-input.html">
 <link rel="import" href="../../paper-button/paper-button.html">
 <link rel="import" href="../../paper-checkbox/paper-checkbox.html">
+<link rel="import" href="../../paper-spinner/paper-spinner.html">
+<link rel="import" href="../../paper-spinner/paper-spinner-lite.html">
+<link rel="import" href="../../paper-toast/paper-toast.html">
 <link rel="import" href="../../gid-list-concepts/gid-list-concepts.html">
 
 <script src="../../jquery/dist/jquery.min.js"></script>
@@ -26,45 +29,72 @@
 			    font-size: 14px;
 			    -webkit-font-smoothing: antialiased;
 			}
+			paper-button.indigo {
+			    background-color: var(--paper-indigo-500);
+			    color: white;
+			}
+			paper-button.indigo:hover {
+			    background-color: var(--paper-indigo-400);
+			}
 			paper-button.green {
 			    background-color: var(--paper-green-500);
 			    color: white;
 			}
+			paper-button.disabled {
+			    pointer-events: none;
+			}
 		    paper-button.green[active] {
-		        background-color: var(--paper-red-500);
+		        background-color: var(--paper-green-500);
 		    }
+		    paper-button.blue {
+			    background-color: #5da9dd;
+			    color: white;
+			}
 		    paper-dropdown-menu, paper-listbox {
 			    width: 250px;
+		    }
+		    paper-dropdown-menu {
+			    height: 200px;
+			    display: block;
 		   }
-		   paper-dropdown-menu {
-		    height: 200px;
-		    display: block;
-		  }
+		   .no-display{
+		  	display-none;
+		   }
+		   .display-block{
+		  	display: block;
+		   }
   		</style>
-  		<h1>Faceted Search</h1>
   		
-  		<paper-input label="Api Url" value={{apiUrl}} id="apiUrl"></paper-input>
-  		<paper-input label="Api Token" value={{apiToken}} id="apiToken"></paper-input>
+			  		<paper-input label="Api Url" value={{apiUrl}} id="apiUrl"></paper-input>
+			  		<paper-input label="Api Token" value={{apiToken}} id="apiToken"></paper-input>
   		
-  		 <template is="dom-if" if="[[apiToken]]">
-	  		<gid-list-concepts  api-url={{apiUrl}}
-		    api-token={{apiToken}} user='1' 
-	        limit = '1000' offset = '0'
-	        concepts='{{concepts}}'></gid-list-concepts>
-        </template>
+				  		 <template is="dom-if" if="[[_fetchConcepts]]">
+					  		<gid-list-concepts  api-url={{apiUrl}}
+						    api-token={{apiToken}} user='{{user}}'
+					        limit = '1000' offset = '0'
+					        concepts='{{concepts}}'></gid-list-concepts>
+				        </template>
         
-         <template is="dom-if" if="[[_isConceptsReceived]]">
-			<select style="width: 200px;">
-			   <template is="dom-repeat" items="[[concepts]]">
-                  <option value="{{item.id}}">{{item.label}}</option>
-                </template>
-            </select>
-	     </template>
-		
-  		<paper-button raised class="green" on-click="_submit">Submit</paper-button>
-  		
-  		
-		
+                        <p>
+                        	<paper-button raised class="green" id="submitBtn" on-click="_submit">Submit</paper-button>
+                        	<paper-button raised class="blue" id="resetBtn" on-click="_resetVal">Reset</paper-button>
+                        </p>
+                        <paper-toast id="toast" text="{{toastrMsg}}"></paper-toast>
+                        <hr/>
+                        
+                        <p>
+                        <template is="dom-if" if="[[_loadingConcepts]]">
+                          <paper-spinner-lite active class="green"></paper-spinner-lite> <span>Loading concepts</span>
+			         	</template>
+			         	<template is="dom-if" if="[[concepts.length]]">
+							<select style="width: 200px;">
+						   		<template is="dom-repeat" items="[[concepts]]">
+			                  		<option value="{{item.id}}">{{item.label}}</option>
+			                	</template>
+			            	</select>
+			                <paper-button raised class="indigo" id="listConceptBtn" on-click="_fetchDetails">Fetch Details</paper-button>
+				     	</template>
+				     	
   		
   		<template is="dom-if" if="[[_fetchConceptDetails]]">
 	        <gid-faceted-search user='1'
@@ -85,7 +115,7 @@
         
        
         <template is="dom-if" if="[[isConceptDetailsReceived]]">
-         	<h1>Concept Details</h1>
+         	<h2>Concept Details</h2>
 	        <template is="dom-repeat" items="[[conceptdetails]]">
             <div class="horizontal-section">
                 <table style="width:100%">
@@ -120,7 +150,7 @@
     <template is="dom-if" if="![[isConceptDetailsReceived]]">
             <p>{{conceptdetails.0.userMessage}}</p>
     </template>
-    <template is="dom-if" if="[[_isResponseReceived]]">	
+    <template is="dom-if" if="[[_facetedSearchPropertiesArr.length]]">	
 	    <template is="dom-repeat" items="[[_facetedSearchPropertiesArr]]">
 	            <div class="horizontal-section">
 	                <table style="width:100%">
@@ -166,8 +196,8 @@
         
         <p></p>
         
-         <template is="dom-if" if="[[_facetedSearchPerformed]]">
-         <h1>Faceted Search Result</h1>
+         	<template is="dom-if" if="[[response.length]]">
+         	<h2>Faceted Search Result</h2>
 	         <template is="dom-repeat" items="[[_facetedSearchResult]]">
 	            <div class="horizontal-section">
 	                <table style="width:100%">
@@ -209,8 +239,10 @@
 					</table>
 	            </div>
 	        </template>
-        </template>
-        
+        	<template is="dom-if" if="![[_isResponseReceived]]">
+        	  <p>{{response.0.userMessage}}</p>
+        	</template>
+       </template>
   </template>
   <script>
     (function() {
@@ -319,17 +351,37 @@
          	  type: Boolean,
    	   		  notify: true,
    	   		  value: false
+            },
+            _fetchConcepts:{
+         	  type: Boolean,
+   	   		  notify: true,
+   	   		  value: false
+            },
+            _loadingConcepts:{
+           	  type: Boolean,
+   	   		  notify: true,
+   	   		  value: false
+            },
+            user:{
+              type: String,
+              notify: true,
+              value: ''
+            },
+            toastrMsg:{
+                type: String,
+                notify: true,
+                value: ''
             }
 	           
         },
         _conceptsListObserver: function(){
         	if(this.concepts.length > 0){	
+        		this._loadingConcepts = false;
 				if(this.concepts[0]['errorCode']){
 					this._isConceptsReceived = false;
 				}
 				else{
 					this._isConceptsReceived =  true;
-					
 				}
         	 }
         },
@@ -355,37 +407,62 @@
  					this._isResponseReceived = false;
  				}
  				else{
- 					this._isResponseReceived = true;
  					if(!this._facetedSearchPerformed){
  						this._facetedSearchPropertiesArr = this._facetedSearchPropertiesArr.concat(this.response);
  					}
  					else{
  						this._facetedSearchResult = this._facetedSearchResult.concat(this.response);
  	 	        	    this.triggerFilter =  false;
+ 	 	        	    this._facetedSearchPerformed = false;
  					}
  				}
          	 }
          },
-         _submit: function(){
+         _fetchDetails: function(){
+        	 this._reset();
+        	 this.concept = $('select option:selected').val();
+        	 this._fetchConceptDetails = true;
+         },
+         _submit: function(event){
+        	 this.apiUrl = $("#apiUrl").val();
+        	 this.apiToken = $("#apiToken").val();
+        	 if(!this.apiUrl){
+        		 this.toastrMsg = "No url provided, hence fetching sample data";
+        		 this.$.toast.open();
+        	 }
+       	     this.concepts = [];
+       	     this._reset();
+       	     this.user = 1;
+       	 	 this._fetchConcepts = true;
+       	 	 this._loadingConcepts = true;
+         },
+         _reset: function(){
+        	 this._facetedSearchPropertiesArr = [];
+        	 this._facetedSearchResult = [];
+        	 this.synonyms =  '';
+        	 this.patterns = [];
+        	 this.relatedDomains = [];
+        	 this.values = [];
+        	 this.columns = [];
+        	 this._fetchConcepts = false;
+        	 this._loadingConcepts = false;
+        	 this._fetchConceptDetails = false;
+        	 this.user = '';
         	 this.isConceptDetailsReceived = false;
         	 this._isResponseReceived = false;
         	 this._facetedSearchPerformed = false;
         	 this.concept = '';
-        	 this.apiUrl = $("#apiUrl").val();
-        	 this.apiToken = $("#apiToken").val();
-        	 this.concept = $('select option:selected').val();
-        	 this._fetchConceptDetails = true;
          },
          _check: function(event){
         	 this._facetedSearchResult = [];
         	 this._facetedSearchPerformed = true;
+        	 this.triggerFilter = false;
         	 if(event.currentTarget.checked){
         		 if(event.currentTarget.name === 'synonyms'){
         			 this.synonyms =  event.currentTarget.value;
         		 }
         		 else{
         			 this[event.currentTarget.name] = this[event.currentTarget.name].concat(event.currentTarget.value);
-        			 console.log(this.patterns);
         		 }
         	 }
         	 else{
@@ -393,17 +470,20 @@
         			 this.synonyms =  '';
         		 }
         		 else{
-        			 var array = this[event.currentTarget.name];
-        			 var index = array.indexOf(event.currentTarget.value);
+        			 var index = this[event.currentTarget.name].indexOf(event.currentTarget.value);
             		 if (index > -1) {
-            			 array.splice(index, 1);
+            			 this[event.currentTarget.name].splice(index, 1);
             		 }
-            		 console.log(array);
-            		 this[event.currentTarget.name] = array;
         		 }
         		 
         	 }
         	 this.triggerFilter =  true;
+         },
+         _resetVal: function(){
+        	 this.concepts = [];
+        	 $("#apiUrl").val("");
+			 $("#apiToken").val("");
+       	     this._reset();
          }
       });
     })();
