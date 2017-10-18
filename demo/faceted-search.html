@@ -107,7 +107,7 @@
         api-url={{apiUrl}}
         api-token={{apiToken}}
         synonyms='{{synonyms}}' patterns='{{patterns}}'
-        related-domains='{{relatedDomains}}' values='{{values}}' columns='{{columns}}' mode="EXPLORE"
+        domains='{{domains}}' values='{{values}}' columns='{{columns}}' mode="EXPLORE"
         trigger-filter={{triggerFilter}}
         response={{response}}>
         </gid-faceted-search>
@@ -173,7 +173,7 @@
 					    </td>
 					    <td valign="top">
 					     <template is="dom-repeat" items="[[item.relatedDomains]]">
-					     	<p><paper-checkbox on-click="_check" name="relatedDomains" value="{{item.label}}">{{item.label}}</paper-checkbox></p>
+					     	<p><paper-checkbox on-click="_check" name="domains" value="{{item.label}}">{{item.label}}</paper-checkbox></p>
 					     </template>
 					    </td>
 					    <td valign="top">
@@ -309,7 +309,7 @@
            	   value: []
            },
            /*Array for related domains parameter*/
-           relatedDomains: {
+           domains: {
            	   type: Array,
            	   notify: true,
            	   value: []
@@ -434,7 +434,7 @@
         	 this._facetedSearchResult = [];
         	 this.synonyms =  '';
         	 this.patterns = [];
-        	 this.relatedDomains = [];
+        	 this.domains = [];
         	 this.values = [];
         	 this.columns = [];
         	 this._fetchConcepts = false;

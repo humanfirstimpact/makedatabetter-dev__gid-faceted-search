@@ -29,8 +29,7 @@ the following steps:
  - 'mode' specifies whether the user is in the 'EXPLORE' or 'DEFINE' mode.
  - The 'response' property would return the response whether the nearby columns has been fetched successfully or not.
  
- API endpoint:
- - GET /columns?near= concept-label"
+
     
 Input:
  - User Id*
@@ -166,8 +165,6 @@ Scenario 1 : User checks on Country synonym:
  - The 'synonyms' property holds the checked synonym
  - The 'response' property would return the success/error response.
  
- API endpoint:
- GET /columns?filter="label eq '<synonym-name>'"
     
 Input:
  - User Id*
@@ -395,8 +392,7 @@ Scenario 2 : User checks on Country synonym and checks a pattern 'Zzzz':
  - To trigger the rest call, the 'trigger-filter' flag must be set to 'true'.
  - The 'response' property would return the success/error response.
  
- API endpoint:
- GET /columns?filter="label eq 'synonym-name' and (patterns every 'pattern-array')"
+
     
 Input:
  - User Id*
@@ -499,7 +495,7 @@ Note: The inputs marked with '*' are mandatory inputs.
         	  _paramsArr: {
 	           	   type: Array,
 	           	   notify: true,
-	           	   value: ["synonyms", "patterns", "relatedDomains", "values", "columns"]
+	           	   value: ["synonyms", "patterns", "domains", "relatedDomains", "values", "columns"]
               },
               /*Parameter object*/
               _paramsObj: {
@@ -526,7 +522,7 @@ Note: The inputs marked with '*' are mandatory inputs.
 		           	   value: []
 	           },
 	           /*Array for related domains parameter*/
-	           relatedDomains: {
+	           domains: {
 		           	   type: Array,
 		           	   notify: true,
 		           	   value: []
@@ -795,6 +791,9 @@ Note: The inputs marked with '*' are mandatory inputs.
               		    		if(this._paramsArr[i] === "synonyms"){
               		    			this._paramVal = this._paramVal + "label ";
           		    			}
+              		    		else if(this._paramsArr[i] === "relatedDomains"){
+              		    			this._paramVal = this._paramVal + "domains "	
+              		    		}
           		    			else{
           		    				this._paramVal = this._paramVal + this._paramsArr[i] + ' ';
           		    			}
