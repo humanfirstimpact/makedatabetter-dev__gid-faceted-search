@@ -614,6 +614,12 @@ Note: The inputs marked with '*' are mandatory inputs.
 	   	          value : '',
 	   	          notify :  true
      	       },
+     	      /*Concept id*/
+     	       _conceptId:{
+     	    	  type: String,
+	   	          value : '',
+	   	          notify :  true
+     	       },
      	      /*The api path key*/
 	           _pathKey: {
 	            	type: String,
@@ -633,10 +639,16 @@ Note: The inputs marked with '*' are mandatory inputs.
                    notify: true
                },
                /*Trigger to fetch near columns*/
-               _fetchNear: {
+               _fetchColumnsNear: {
             	  type: Boolean,
          		  notify: true,
          		  value: false
+               },
+               /*Trigger to fetch clusters*/
+               _fetchClustersNear: {
+            	  type: Boolean,
+          		  notify: true,
+          		  value: false
                },
                /*Params value*/
                _paramVal: {
@@ -649,9 +661,9 @@ Note: The inputs marked with '*' are mandatory inputs.
          /* Reset method */
          _reset: function () {
         	// this.conceptdetails = [];
-        	 this.response = [];
         	 this.triggerFilter = false;
-        	 this._fetchNear =  false;
+        	 this._fetchColumnsNear =  false;
+        	 this._fetchClustersNear =  false;
         	 this._paramVal = '';
       		 this._apiEntity = '';
              this._path = '';
@@ -663,18 +675,20 @@ Note: The inputs marked with '*' are mandatory inputs.
         	 if (this.conceptdetails.length > 0) {
         		 this.conceptdetails.forEach( function(i) { 
         			 that._conceptLabel =  i.label;
+        			 that._conceptId = i.id;
         			 if(i.exampleColumns.length === 0){
         				 if (!that.apiUrl) {
         					 that._facetedSearchUrl = that.importPath + 'assets/json/concept-details.json';
         					 that._facetedSearchTimeout =  that._facetedSearchTimeout - 1;
                			}
                  		else {
-                 			that._fetchNear =  true;
-                 			that._set();
+                 			that._fetchColumnsNear =  true;
+                 			that.triggerFilter = true;
                   		}
         			 }
         			 else{
-        				 //TODO
+        				 that._fetchClustersNear =  true;
+        				 that.triggerFilter = true;
         			 }
         		} );
          	}
@@ -685,7 +699,13 @@ Note: The inputs marked with '*' are mandatory inputs.
         	 this._apiEntity = '';
              this._path = '';
         	 this._pathKey =  'default';
-   			 this._apiEntity = 'FACETED-COLUMNS';
+        	 if(this._fetchClustersNear){
+        		 //TODO
+        		 this._apiEntity = 'CLUSTERS';
+        	 }
+        	 else if(this._fetchColumnsNear || this.triggerFilter){
+        		 this._apiEntity = 'FACETED-COLUMNS';
+        	 }
          },
          /* Observer for api path */
          _pathReceived: function(){
@@ -699,16 +719,23 @@ Note: The inputs marked with '*' are mandatory inputs.
          			}
          		}
        			this._facetedSearchUrl = this.apiUrl + res.join("");
-       			if(this._fetchNear){
+       			if(this._fetchColumnsNear){
        				this._facetedSearchParams = JSON.stringify({
-      	        	  "near": this._conceptLabel});
+      	        	  "near": this._conceptLabel,
+      	        	  "filter": this._paramVal});
+       				this._setAttributes();
+       			}
+       			else if(this._fetchClustersNear){
+       				this._facetedSearchParams = JSON.stringify({
+      	        	  "near": this._conceptId,
+      	        	  "filter": this._paramVal});
        				this._setAttributes();
        			}
        			else{
        				if(this._paramVal){
        					this._facetedSearchParams = JSON.stringify({
-            	        	  "filter": this._paramVal}); 
-       					this._setAttributes();
+          	        	  "filter": this._paramVal}); 
+     					this._setAttributes();
        				}
        			}
        			
@@ -723,60 +750,126 @@ Note: The inputs marked with '*' are mandatory inputs.
          },
          /* Example columns success response handler */
          _facetedSearchResponseReceived : function(newvalue, oldvalue){
-         	 this._reset();
+        	 this.response = [];
  	          if(newvalue != null){
  		             this.async(function() {
- 		         		this.response =  this.response.concat(newvalue);
+ 		            	if(this._fetchClustersNear){
+ 		            		var obj = {};
+ 		            		obj["synonyms"] = [];
+ 		            		obj["synonyms"] = obj["synonyms"].concat(newvalue["clusters"][0]["synonyms"]);
+ 		            		var col = newvalue["clusters"][0]["columns"][0];
+ 		            		for(var key in col){
+ 		            			obj[key] = col[key]; 
+ 		            		}
+ 		            		this.response = this.response.concat(obj);
+ 		            	}
+ 		            	else{
+ 		            		this.response =  this.response.concat(newvalue);
+ 		            	}
+ 		         		this._reset();
  		   		 	          }, 500);
  	          }
           	
           },
           /* Example columns error response handler */
           _facetedSearchErrorReceived : function(newvalue, oldvalue){
-          	 this._reset();
+        	  this.response = [];
     	          if(newvalue != null){
     		             this.async(function() {
     		         		this.response =  this.response.concat(newvalue.response);
+    		         		this._reset();
     		   		 	          }, 500);
     	          }
-             	
           },
           /*Observer of 'triggerFilter' flag*/
           _observeTriggerFilter:  function(){
         	  if(this.triggerFilter){
         		  this._paramVal = '';
         		  var j = 0;
-                  for (var i in this._paramsArr){
-                  	if(this[this._paramsArr[i]].length > 0){
-                  			if(j>0){
-                  				this._paramVal = this._paramVal + " and " + "(";
-                  			}
-          		    		if(this._paramsArr[i] === "synonyms"){
-          		    			this._paramVal = this._paramVal + "label ";
-      		    			}
-      		    			else{
-      		    				this._paramVal = this._paramVal + this._paramsArr[i] + ' ';
-      		    			}
-      		    			if(typeof(this[this._paramsArr[i]]) === "string"){
-      		    				this._paramVal = this._paramVal + "eq ";
-      		    				this._paramVal = this._paramVal + "'" + this[this._paramsArr[i]] + "'";
-      		    			}      		    				
-      		    			else{
-//       		    				if(this[this._paramsArr[i]].length > 1){
-      		    					this._paramVal = this._paramVal + "every ";
-//           		    			}
-//           		    			else{
-//           		    				this._paramVal = this._paramVal + "eq ";
-//           		    			}
-      		    				this._paramVal = this._paramVal + "['" + this[this._paramsArr[i]].join("','")+ "']";
-      		    			}
-      		    			if(j>0){
-      		    				this._paramVal = this._paramVal + ')';
-      		    			}
-      		    			j = j+1;
-                  	}
-                  	
-                  }
+        		  if(this._fetchColumnsNear || this._fetchClustersNear){
+        			  for (var i in this._paramsArr){
+        				if(this.conceptdetails[0].hasOwnProperty([this._paramsArr[i]])){
+                      		if(this.conceptdetails[0][this._paramsArr[i]].length > 0){
+                      			if(j>0){
+                      				this._paramVal = this._paramVal + " and " + "(";
+                      			}
+              		    		if(this._paramsArr[i] === "synonyms"){
+              		    			this._paramVal = this._paramVal + "label ";
+          		    			}
+          		    			else{
+          		    				this._paramVal = this._paramVal + this._paramsArr[i] + ' ';
+          		    			}
+          		    			if(this._paramsArr[i] === "synonyms"){
+          		    				this._paramVal = this._paramVal + "eq ";
+          		    				this._paramVal = this._paramVal + "'" + this.conceptdetails[0]["synonyms"][0]["label"] + "'";
+          		    			}      		    				
+          		    			else{
+          		    					var verified = [];
+					        	    	var notVerified = [];
+										for(var index in this.conceptdetails[0][this._paramsArr[i]]){
+											if(this.conceptdetails[0][this._paramsArr[i]][index]["assessment"] === 'Y'){
+												verified = verified.concat(this.conceptdetails[0][this._paramsArr[i]][index]["label"]);
+												//this._paramVal = this._paramVal + "every ";
+											}
+											else if(this.conceptdetails[0][this._paramsArr[i]][index]["assessment"] === 'N'){
+												notVerified = notVerified.concat(this.conceptdetails[0][this._paramsArr[i]][index]["label"])
+											}
+          		    					
+          		    					}
+										if(verified.length > 0){
+											this._paramVal = this._paramVal + "every ";
+											this._paramVal = this._paramVal + "['" + verified.join("','")+ "']";
+										}
+										if(verified.length > 0 && notVerified.length > 0){
+											this._paramVal = this._paramVal + " and " + this._paramsArr[i] + ' ';
+										}
+										if(notVerified.length > 0){
+											this._paramVal = this._paramVal + "not ";
+											this._paramVal = this._paramVal + "['" + notVerified.join("','")+ "']";
+										}
+          		    			}
+          		    			if(j>0){
+          		    				this._paramVal = this._paramVal + ')';
+          		    			}
+          		    			j = j+1;
+                      	
+                      }
+        			  }
+        			  }
+        		  }
+        		  else{
+        			  for (var i in this._paramsArr){
+                        	if(this[this._paramsArr[i]].length > 0){
+                        			if(j>0){
+                        				this._paramVal = this._paramVal + " and " + "(";
+                        			}
+                		    		if(this._paramsArr[i] === "synonyms"){
+                		    			this._paramVal = this._paramVal + "label ";
+            		    			}
+            		    			else{
+            		    				this._paramVal = this._paramVal + this._paramsArr[i] + ' ';
+            		    			}
+            		    			if(typeof(this[this._paramsArr[i]]) === "string"){
+            		    				this._paramVal = this._paramVal + "eq ";
+            		    				this._paramVal = this._paramVal + "'" + this[this._paramsArr[i]] + "'";
+            		    			}      		    				
+            		    			else{
+//             		    				if(this[this._paramsArr[i]].length > 1){
+            		    					this._paramVal = this._paramVal + "every ";
+//                 		    			}
+//                 		    			else{
+//                 		    				this._paramVal = this._paramVal + "eq ";
+//                 		    			}
+            		    				this._paramVal = this._paramVal + "['" + this[this._paramsArr[i]].join("','")+ "']";
+            		    			}
+            		    			if(j>0){
+            		    				this._paramVal = this._paramVal + ')';
+            		    			}
+            		    			j = j+1;
+                        	}
+                        	
+                        }
+        		  }
                   this._set();
         	  }
         	 
