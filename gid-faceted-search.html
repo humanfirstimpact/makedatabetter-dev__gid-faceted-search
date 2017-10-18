@@ -755,8 +755,7 @@ Note: The inputs marked with '*' are mandatory inputs.
  		             this.async(function() {
  		            	if(this._fetchClustersNear){
  		            		var obj = {};
- 		            		obj["synonyms"] = [];
- 		            		obj["synonyms"] = obj["synonyms"].concat(newvalue["clusters"][0]["synonyms"]);
+ 		            		obj["synonyms"] = newvalue["synonyms"];
  		            		var col = newvalue["clusters"][0]["columns"][0];
  		            		for(var key in col){
  		            			obj[key] = col[key]; 
