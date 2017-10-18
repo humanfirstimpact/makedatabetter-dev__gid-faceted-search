@@ -4,6 +4,9 @@
   "authors": [
     "Shreya Bharadwaj"
   ],
+  "license": "http://polymer.github.io/LICENSE.txt",
+  "homepage": "https://github.com/makedatabetter-dev/gid-faceted-search",
+  "ignore": [],
   "dependencies": {
     "polymer": "Polymer/polymer#^1.6.0",
     "iron-ajax": "PolymerElements/iron-ajax#^1.4.4",

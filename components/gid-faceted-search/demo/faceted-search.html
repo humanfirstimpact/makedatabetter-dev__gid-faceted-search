@@ -71,7 +71,6 @@
 				  		 <template is="dom-if" if="[[_fetchConcepts]]">
 					  		<gid-list-concepts  api-url={{apiUrl}}
 						    api-token={{apiToken}} user='{{user}}'
-					        limit = '1000' offset = '0'
 					        concepts='{{concepts}}'></gid-list-concepts>
 				        </template>
         
@@ -392,12 +391,6 @@
 				}
 				else{
 					this.isConceptDetailsReceived =  true;
-					var that = this;
-	        		this.conceptdetails.forEach( function(i) { 
-	        			 if(i.exampleColumns.length > 0){
-	        				 that._facetedSearchPropertiesArr = that._facetedSearchPropertiesArr.concat(that.conceptdetails); 
-	        			 }
-	        		} );
 				}
         	 }
          },
