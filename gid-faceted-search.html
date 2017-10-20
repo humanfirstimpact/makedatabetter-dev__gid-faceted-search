@@ -724,7 +724,9 @@ Note: The inputs marked with '*' are mandatory inputs.
        			else if(this._fetchClustersNear){
        				this._facetedSearchParams = JSON.stringify({
       	        	  "near": this._conceptId,
-      	        	  "filter": this._paramVal});
+      	        	  "filter": this._paramVal,
+                      "distance": 0.5
+                    });
        				this._setAttributes();
        			}
        			else{
