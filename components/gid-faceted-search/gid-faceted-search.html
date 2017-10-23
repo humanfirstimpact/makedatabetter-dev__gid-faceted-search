@@ -539,6 +539,12 @@ Note: The inputs marked with '*' are mandatory inputs.
 		           	   notify: true,
 		           	   value: []
 	           },
+	           /*This is a private property*/
+	           relatedDomains: {
+	           	   type: Array,
+	           	   notify: true,
+	           	   value: []
+           	  },
 	           /*Trigger filter. Default is 'false'*/
         	  triggerFilter: {
         		  type: Boolean,
@@ -724,7 +730,9 @@ Note: The inputs marked with '*' are mandatory inputs.
        			else if(this._fetchClustersNear){
        				this._facetedSearchParams = JSON.stringify({
       	        	  "near": this._conceptId,
-      	        	  "filter": this._paramVal});
+      	        	  "filter": this._paramVal,
+                      "distance": 0.5
+                    });
        				this._setAttributes();
        			}
        			else{
