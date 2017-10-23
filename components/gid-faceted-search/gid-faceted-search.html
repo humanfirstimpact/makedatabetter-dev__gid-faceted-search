@@ -491,17 +491,19 @@ Note: The inputs marked with '*' are mandatory inputs.
 	   	          value : '',
 	   	          notify :  true
 	 	       },
-        	  /*Array listing the parameters*/
-        	  _paramsArr: {
-	           	   type: Array,
-	           	   notify: true,
-	           	   value: ["synonyms", "patterns", "domains", "relatedDomains", "values", "columns"]
-              },
-              /*Parameter object*/
+              /*Object listing the various parameters*/
               _paramsObj: {
         	       type: Array,
 	           	   notify: true,
-	           	   value: {}
+	           	   value: {
+		           		"synonyms" : "synonyms",
+		           		"patterns"	: "patterns",
+		           		"relatedDomains" : "domains",
+		           		"domains" : "domains",
+		           		"exampleValues" : "values",
+		           		"exampleColumns" : "columns",
+		           		"columns" : "columns"
+	           	   }
               },
               /*Mode can either be 'EXPLORE' or 'DEFINE'. The default mode is 'EXPLORE'*/
               mode: {
@@ -539,12 +541,6 @@ Note: The inputs marked with '*' are mandatory inputs.
 		           	   notify: true,
 		           	   value: []
 	           },
-	           /*This is a private property*/
-	           relatedDomains: {
-	           	   type: Array,
-	           	   notify: true,
-	           	   value: []
-           	  },
 	           /*Trigger filter. Default is 'false'*/
         	  triggerFilter: {
         		  type: Boolean,
@@ -721,28 +717,32 @@ Note: The inputs marked with '*' are mandatory inputs.
          			}
          		}
        			this._facetedSearchUrl = this.apiUrl + res.join("");
+       			var obj = {};
        			if(this._fetchColumnsNear){
-       				this._facetedSearchParams = JSON.stringify({
-      	        	  "near": this._conceptLabel,
-      	        	  "filter": this._paramVal});
-       				this._setAttributes();
+       				if(this._paramVal){
+       					obj["near"] = this._conceptLabel;
+       					obj["filter"] = this._paramVal;
+       				}
+       				else{
+       					obj["near"] = this._conceptLabel;
+       				}
        			}
        			else if(this._fetchClustersNear){
-       				this._facetedSearchParams = JSON.stringify({
-      	        	  "near": this._conceptId,
-      	        	  "filter": this._paramVal,
-                      "distance": 0.5
-                    });
-       				this._setAttributes();
+       				if(this._paramVal){
+       					obj["near"] = this._conceptId;
+       					obj["filter"] = this._paramVal;
+       				}
+       				else{
+       					obj["near"] = this._conceptLabel;
+       				}
        			}
        			else{
        				if(this._paramVal){
-       					this._facetedSearchParams = JSON.stringify({
-          	        	  "filter": this._paramVal}); 
-     					this._setAttributes();
+       					obj["filter"] = this._paramVal;
        				}
        			}
-       			
+       			this._facetedSearchParams = JSON.stringify(obj);
+   				this._setAttributes();
          	}
          },
          /* Set timeout and token */
@@ -789,52 +789,29 @@ Note: The inputs marked with '*' are mandatory inputs.
         	  if(this.triggerFilter){
         		  this._paramVal = '';
         		  var j = 0;
+        		  var keys  = [];
+    			  for(var key in this._paramsObj){
+    				  keys = keys.concat(key); 
+            		}
         		  if(this._fetchColumnsNear || this._fetchClustersNear){
-        			  for (var i in this._paramsArr){
-        				if(this.conceptdetails[0].hasOwnProperty([this._paramsArr[i]])){
-                      		if(this.conceptdetails[0][this._paramsArr[i]].length > 0){
-                      			if(j>0){
-                      				this._paramVal = this._paramVal + " and " + "(";
-                      			}
-              		    		if(this._paramsArr[i] === "synonyms"){
-              		    			this._paramVal = this._paramVal + "label ";
-          		    			}
-              		    		else if(this._paramsArr[i] === "relatedDomains"){
-              		    			this._paramVal = this._paramVal + "domains "	
-              		    		}
-          		    			else{
-          		    				this._paramVal = this._paramVal + this._paramsArr[i] + ' ';
-          		    			}
-          		    			if(this._paramsArr[i] === "synonyms"){
-          		    				this._paramVal = this._paramVal + "eq ";
-          		    				this._paramVal = this._paramVal + "'" + this.conceptdetails[0]["synonyms"][0]["label"] + "'";
-          		    			}      		    				
-          		    			else{
-          		    					var verified = [];
+        			  for (var i in keys){
+        				if(this.conceptdetails[0].hasOwnProperty(keys[i])){
+                      		if(this.conceptdetails[0][keys[i]].length > 0){
 					        	    	var notVerified = [];
-										for(var index in this.conceptdetails[0][this._paramsArr[i]]){
-											if(this.conceptdetails[0][this._paramsArr[i]][index]["assessment"] === 'Y'){
-												verified = verified.concat(this.conceptdetails[0][this._paramsArr[i]][index]["label"]);
-												//this._paramVal = this._paramVal + "every ";
-											}
-											else if(this.conceptdetails[0][this._paramsArr[i]][index]["assessment"] === 'N'){
-												notVerified = notVerified.concat(this.conceptdetails[0][this._paramsArr[i]][index]["label"])
+										for(var index in this.conceptdetails[0][keys[i]]){
+											if(this.conceptdetails[0][keys[i]][index]["assessment"] === 'N'){
+												notVerified = notVerified.concat(this.conceptdetails[0][keys[i]][index]["label"])
 											}
           		    					
           		    					}
-										if(verified.length > 0){
-											this._paramVal = this._paramVal + "every ";
-											this._paramVal = this._paramVal + "['" + verified.join("','")+ "']";
-										}
-										if(verified.length > 0 && notVerified.length > 0){
-											this._paramVal = this._paramVal + " and " + this._paramsArr[i] + ' ';
-										}
 										if(notVerified.length > 0){
-											this._paramVal = this._paramVal + "not ";
+											if(j>0){
+			                      				this._paramVal = this._paramVal + " and " + "(";
+			                      			}
+											this._paramVal = this._paramVal + this._paramsObj[keys[i]] + ' '+ "not ";
 											this._paramVal = this._paramVal + "['" + notVerified.join("','")+ "']";
 										}
-          		    			}
-          		    			if(j>0){
+          		    			if(j>0 && notVerified.length > 0){
           		    				this._paramVal = this._paramVal + ')';
           		    			}
           		    			j = j+1;
@@ -844,29 +821,25 @@ Note: The inputs marked with '*' are mandatory inputs.
         			  }
         		  }
         		  else{
-        			  for (var i in this._paramsArr){
-                        	if(this[this._paramsArr[i]].length > 0){
+        			  for (var i in keys){
+        				 if(this[keys[i]]){
+                        	if(this[keys[i]].length > 0){
                         			if(j>0){
                         				this._paramVal = this._paramVal + " and " + "(";
                         			}
-                		    		if(this._paramsArr[i] === "synonyms"){
+                		    		if(keys[i] === "synonyms"){
                 		    			this._paramVal = this._paramVal + "label ";
             		    			}
             		    			else{
-            		    				this._paramVal = this._paramVal + this._paramsArr[i] + ' ';
+            		    				this._paramVal = this._paramVal + this._paramsObj[keys[i]] + ' ';
             		    			}
-            		    			if(typeof(this[this._paramsArr[i]]) === "string"){
+            		    			if(typeof(this[this._paramsObj[keys[i]]]) === "string"){
             		    				this._paramVal = this._paramVal + "eq ";
-            		    				this._paramVal = this._paramVal + "'" + this[this._paramsArr[i]] + "'";
+            		    				this._paramVal = this._paramVal + "'" + this[this._paramsObj[keys[i]]] + "'";
             		    			}      		    				
             		    			else{
-//             		    				if(this[this._paramsArr[i]].length > 1){
             		    					this._paramVal = this._paramVal + "every ";
-//                 		    			}
-//                 		    			else{
-//                 		    				this._paramVal = this._paramVal + "eq ";
-//                 		    			}
-            		    				this._paramVal = this._paramVal + "['" + this[this._paramsArr[i]].join("','")+ "']";
+            		    				this._paramVal = this._paramVal + "['" + this[this._paramsObj[keys[i]]].join("','")+ "']";
             		    			}
             		    			if(j>0){
             		    				this._paramVal = this._paramVal + ')';
@@ -874,6 +847,7 @@ Note: The inputs marked with '*' are mandatory inputs.
             		    			j = j+1;
                         	}
                         	
+        				 }
                         }
         		  }
                   this._set();
