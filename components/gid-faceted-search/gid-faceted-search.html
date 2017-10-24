@@ -757,22 +757,36 @@ Note: The inputs marked with '*' are mandatory inputs.
         	 this.response = [];
  	          if(newvalue != null){
  		             this.async(function() {
+ 		            	var temp = {};
+ 		            	var obj = {};
  		            	if(this._fetchClustersNear){
- 		            		var obj = {};
- 		            		obj["synonyms"] = newvalue["synonyms"];
+ 		            		temp["synonyms"] = newvalue["synonyms"];
  		            		var col = newvalue["clusters"][0]["columns"][0];
  		            		for(var key in col){
- 		            			obj[key] = col[key]; 
+ 		            			temp[key] = col[key]; 
  		            		}
+ 		            		obj = this._addAssessmentField(temp);
  		            		this.response = this.response.concat(obj);
  		            	}
  		            	else{
+ 		            		obj = this._addAssessmentField(newvalue);
  		            		this.response =  this.response.concat(newvalue);
  		            	}
  		         		this._reset();
  		   		 	          }, 500);
  	          }
           	
+          },
+          /* Add assessment field in response */
+          _addAssessmentField:  function(obj){
+        	  for (var key in obj) {
+       			for(var index=0; index<obj[key].length; index++){
+       				if(typeof(obj[key]) === "object"){
+       					obj[key][index]["assessment"] = 'M';
+       				}
+       			}
+       		}
+        	return obj;
           },
           /* Example columns error response handler */
           _facetedSearchErrorReceived : function(newvalue, oldvalue){
