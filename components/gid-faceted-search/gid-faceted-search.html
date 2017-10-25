@@ -738,7 +738,7 @@ Note: The inputs marked with '*' are mandatory inputs.
        			}
        			else{
        				if(this._paramVal){
-       					obj["filter"] = this._paramVal;
+       					obj["filter"] = this._paramVal; 
        				}
        			}
        			this._facetedSearchParams = JSON.stringify(obj);
@@ -768,9 +768,12 @@ Note: The inputs marked with '*' are mandatory inputs.
  		            		obj = this._addAssessmentField(temp);
  		            		this.response = this.response.concat(obj);
  		            	}
- 		            	else{
+ 		            	else if(this._fetchColumnsNear){
  		            		obj = this._addAssessmentField(newvalue);
  		            		this.response =  this.response.concat(obj);
+ 		            	}
+ 		            	else{
+ 		            		this.response =  this.response.concat(newvalue);
  		            	}
  		         		this._reset();
  		   		 	          }, 500);
