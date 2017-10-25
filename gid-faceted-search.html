@@ -729,7 +729,7 @@ Note: The inputs marked with '*' are mandatory inputs.
        				}
        			}
        			else if(this._fetchClustersNear){
-//        				this._facetedSearchUrl = this.importPath + 'assets/json/clusters.json';
+       	//			this._facetedSearchUrl = this.importPath + 'assets/json/clusters.json';
        				if(this._paramVal){
        					obj["near"] = this._conceptId;
        					obj["filter"] = this._paramVal;
@@ -777,16 +777,16 @@ Note: The inputs marked with '*' are mandatory inputs.
  		            			}
  		            		}
  		            		obj = this._addValidatedFields(temp);
- 		            		obj = this._addAssessmentField(obj);
+ 		            		obj = this._addRequiredFields(obj);
  		            		this.response = this.response.concat(obj);
  		            	}
  		            	else if(this._fetchColumnsNear){
  		            		obj = this._addValidatedFields(newvalue);
- 		            		obj = this._addAssessmentField(obj);
+ 		            		obj = this._addRequiredFields(obj);
  		            		this.response =  this.response.concat(obj);
  		            	}
  		            	else{
- 		            		obj = this._addAssessmentField(newvalue);
+ 		            		obj = this._addRequiredFields(newvalue);
  		            		this.response =  this.response.concat(obj);
  		            	}
  		         		this._reset();
@@ -808,8 +808,8 @@ Note: The inputs marked with '*' are mandatory inputs.
         	  return obj;
           },
           
-          /* Add assessment field in response */
-          _addAssessmentField:  function(obj){
+          /* Add assessment and relevance field in response */
+          _addRequiredFields:  function(obj){
         	  if(this._fetchColumnsNear || this._fetchClustersNear){
         		  var foundMatch = false;
             	  for (var key in obj) {
