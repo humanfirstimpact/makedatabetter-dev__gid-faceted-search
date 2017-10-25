@@ -4,6 +4,7 @@
 <link rel="import" href="../polymer/polymer.html">
 <link rel="import" href="../gid-api/gid-api.html">
 <link rel="import" href="../gid-concept-details/gid-concept-details.html">
+<script src="../lodash/dist/lodash.min.js"></script>
 <!--
 ## gid-faceted-search
 
@@ -728,6 +729,7 @@ Note: The inputs marked with '*' are mandatory inputs.
        				}
        			}
        			else if(this._fetchClustersNear){
+       			//	this._facetedSearchUrl = this.importPath + 'assets/json/clusters.json';
        				if(this._paramVal){
        					obj["near"] = this._conceptId;
        					obj["filter"] = this._paramVal;
@@ -759,12 +761,18 @@ Note: The inputs marked with '*' are mandatory inputs.
  		             this.async(function() {
  		            	var temp = {};
  		            	var obj = {};
+ 		            	var keys = ["synonyms", "patterns", "relatedDomains", "exampleValues", "exampleColumns"];
+ 		            	for(var idx=0; idx<keys.length; idx++){
+ 		            		temp[keys[idx]] = [];
+ 		            	}
  		            	if(this._fetchClustersNear){
  		            		temp["synonyms"] = newvalue["synonyms"];
  		            		for(var i = 0; i<newvalue["clusters"].length; i++){
  		            			for(var j=0; j<newvalue["clusters"][i]["columns"].length; j++){
  		            				for(var key in newvalue["clusters"][i]["columns"][j]){
- 	 	 		            			temp[key] = newvalue["clusters"][i]["columns"][j][key]; 
+ 		            					if(typeof(newvalue["clusters"][i]["columns"][j][key]) === "object"){
+ 		            						temp[key] = temp[key].concat(newvalue["clusters"][i]["columns"][j][key]);
+ 		            					}
  	 	 		            		}
  		            			}
  		            		}
@@ -793,17 +801,22 @@ Note: The inputs marked with '*' are mandatory inputs.
            			for(var index=0; index<obj[key].length; index++){
            				foundMatch = false;
            				if(typeof(obj[key]) === "object"){
-           					for(var i=0; i<this.conceptdetails[0][key].length; i++){
-           						if(typeof(this.conceptdetails[0][key]) === "object"){
-    	       						if(obj[key][index]["id"] === this.conceptdetails[0][key][i]["id"]){
-    	       							obj[key][index]["assessment"] = this.conceptdetails[0][key][i]["assessment"];
-    	       							foundMatch = true;
-    	       							break;
-    	       						}
-    	       						else{
-    	       							obj[key][index]["assessment"] = 'M';
-    	       						}
-           						}
+           					if(this.conceptdetails[0][key].length > 0 ){
+           						for(var i=0; i<this.conceptdetails[0][key].length; i++){
+               						if(typeof(this.conceptdetails[0][key]) === "object"){
+        	       						if(obj[key][index]["id"] === this.conceptdetails[0][key][i]["id"]){
+        	       							obj[key][index]["assessment"] = this.conceptdetails[0][key][i]["assessment"];
+        	       							foundMatch = true;
+        	       							break;
+        	       						}
+        	       						else{
+        	       							obj[key][index]["assessment"] = 'M';
+        	       						}
+               						}
+               					}
+           					}
+           					else{
+           						obj[key][index]["assessment"] = 'M';
            					}
            					if(foundMatch){
            						break;
@@ -819,6 +832,10 @@ Note: The inputs marked with '*' are mandatory inputs.
         			  }
         		  }
         	  }
+        	for (var key in obj){
+        		obj[key] = _.uniqBy(obj[key], "id"); 
+        	}
+        	
         	return obj;
           },
           /* Example columns error response handler */
