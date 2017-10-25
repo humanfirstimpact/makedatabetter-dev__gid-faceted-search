@@ -5,6 +5,8 @@
 <link rel="import" href="../../paper-spinner/paper-spinner.html">
 <link rel="import" href="../../paper-spinner/paper-spinner-lite.html">
 <link rel="import" href="../../paper-toast/paper-toast.html">
+<link rel="import" href="../../paper-button-group/paper-button-group.html">
+<link rel="import" href="../../paper-styles/paper-styles.html">
 <link rel="import" href="../../gid-list-concepts/gid-list-concepts.html">
 
 <script src="../../jquery/dist/jquery.min.js"></script>
@@ -57,6 +59,11 @@
 			    height: 200px;
 			    display: block;
 		   }
+		   paper-button.assessment[active] {
+		        color: white;
+		        background-color: var(--paper-blue-500);
+		        --paper-button-flat-focus-color: var(--paper-green-50);
+	    	}
 		   .no-display{
 		  	display-none;
 		   }
@@ -149,7 +156,13 @@
     <template is="dom-if" if="![[isConceptDetailsReceived]]">
             <p>{{conceptdetails.0.userMessage}}</p>
     </template>
-    <template is="dom-if" if="[[_facetedSearchPropertiesArr.length]]">	
+    
+    
+    <template is="dom-if" if="[[_facetedSearchPropertiesArr.length]]">
+	    <paper-button-group attr-for-selected="name" on-click="_changeMode" selected="EXPLORE">
+		    <paper-button class="assessment" name="EXPLORE">EXPLORE</paper-button>
+		    <paper-button class="assessment" name="DEFINE">DEFINE</paper-button>
+		</paper-button-group>	
 	    <template is="dom-repeat" items="[[_facetedSearchPropertiesArr]]">
 	            <div class="horizontal-section">
 	                <table style="width:100%">
@@ -163,27 +176,65 @@
 					  <tr>
 					    <td valign="top">
 					     <template is="dom-repeat" items="[[item.synonyms]]">
-					     	<p><paper-checkbox on-click="_check" name="synonyms" value="{{item.label}}">{{item.label}}</paper-checkbox></p>
+					     	<p><paper-checkbox on-click="_check" name="synonyms" value="{{item.label}}">{{item.label}}</paper-checkbox>
+					     	<template is="dom-if" if="[[_defineMode]]">
+						     	<paper-button-group attr-for-selected="name" selected="[[_getValueFromItem(item)]]">
+								    <paper-button class="assessment" name="Y">YES</paper-button>
+								    <paper-button class="assessment" name="N">NO</paper-button>
+								    <paper-button class="assessment" name="M">MAYBE</paper-button>
+								</paper-button-group>
+							</template>
+							</p>
 					     </template>
 					    </td>
 					    <td valign="top">
 					     <template is="dom-repeat" items="[[item.patterns]]">
-					     	<p><paper-checkbox on-click="_check" name="patterns" value="{{item.label}}">{{item.label}}</paper-checkbox></p>
+					     	<p><paper-checkbox on-click="_check" name="patterns" value="{{item.label}}">{{item.label}}</paper-checkbox>
+					     	<template is="dom-if" if="[[_defineMode]]">
+						     	<paper-button-group attr-for-selected="name" selected="[[_getValueFromItem(item)]]">
+								    <paper-button class="assessment" name="Y">YES</paper-button>
+								    <paper-button class="assessment" name="N">NO</paper-button>
+								    <paper-button class="assessment" name="M">MAYBE</paper-button>
+								</paper-button-group>
+							</template>
+							</p>
 					     </template>
 					    </td>
 					    <td valign="top">
 					     <template is="dom-repeat" items="[[item.relatedDomains]]">
-					     	<p><paper-checkbox on-click="_check" name="domains" value="{{item.label}}">{{item.label}}</paper-checkbox></p>
+					     	<p><paper-checkbox on-click="_check" name="domains" value="{{item.label}}">{{item.label}}</paper-checkbox>
+					     	<template is="dom-if" if="[[_defineMode]]">
+					     	<paper-button-group attr-for-selected="name" selected="[[_getValueFromItem(item)]]">
+							    <paper-button class="assessment" name="Y">YES</paper-button>
+							    <paper-button class="assessment" name="N">NO</paper-button>
+							    <paper-button class="assessment" name="M">MAYBE</paper-button>
+							</paper-button-group>
+							</template>
+							</p>
 					     </template>
 					    </td>
 					    <td valign="top">
 					     <template is="dom-repeat" items="[[item.exampleValues]]">
-					     	<p><paper-checkbox on-click="_check" name="values" value="{{item.label}}">{{item.label}}</paper-checkbox></p>
+					     	<p><paper-checkbox on-click="_check" name="values" value="{{item.label}}">{{item.label}}</paper-checkbox>
+					     	<template is="dom-if" if="[[_defineMode]]">
+					     	<paper-button-group attr-for-selected="name" selected="[[_getValueFromItem(item)]]">
+							    <paper-button class="assessment" name="Y">YES</paper-button>
+							    <paper-button class="assessment" name="N">NO</paper-button>
+							    <paper-button class="assessment" name="M">MAYBE</paper-button>
+							</paper-button-group>
+							</template></p>
 					     </template>
 					    </td>
 					    <td valign="top">
 					     <template is="dom-repeat" items="[[item.exampleColumns]]">
-					     	<p><paper-checkbox on-click="_check" name="columns" value="{{item.label}}">{{item.label}}</paper-checkbox></p>
+					     	<p><paper-checkbox on-click="_check" name="columns" value="{{item.label}}">{{item.label}}</paper-checkbox>
+					     	<template is="dom-if" if="[[_defineMode]]">
+					     	<paper-button-group attr-for-selected="name" selected="[[_getValueFromItem(item)]]">
+							    <paper-button class="assessment" name="Y">YES</paper-button>
+							    <paper-button class="assessment" name="N">NO</paper-button>
+							    <paper-button class="assessment" name="M">MAYBE</paper-button>
+							</paper-button-group>
+							</template></p>
 					     </template>
 					    </td>
 					    
@@ -370,6 +421,11 @@
                 type: String,
                 notify: true,
                 value: ''
+            },
+            _defineMode: {
+            	type: Boolean,
+                notify: true,
+                value: false
             }
 	           
         },
@@ -445,6 +501,7 @@
         	 this._isResponseReceived = false;
         	 this._facetedSearchPerformed = false;
         	 this.concept = '';
+        	 this._defineMode = false;
          },
          _check: function(event){
         	 this._facetedSearchResult = [];
@@ -477,6 +534,17 @@
         	 $("#apiUrl").val("");
 			 $("#apiToken").val("");
        	     this._reset();
+         },
+         _getValueFromItem: function(item){
+        	 return item.assessment;
+         },
+         _changeMode: function(){
+        	 if(event.currentTarget.selected === 'DEFINE'){
+        		 this._defineMode = true;
+    		 }
+        	 else{
+        		 this._defineMode = false;
+        	 }
          }
       });
     })();
