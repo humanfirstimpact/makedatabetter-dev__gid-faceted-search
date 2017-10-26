@@ -177,6 +177,7 @@
 					    <td valign="top">
 					     <template is="dom-repeat" items="[[item.synonyms]]">
 					     	<p><paper-checkbox on-click="_check" name="synonyms" value="{{item.label}}">{{item.label}}</paper-checkbox>
+					     	<span>&nbsp;({{item.relevance}}%)</span>
 					     	<template is="dom-if" if="[[_defineMode]]">
 						     	<paper-button-group attr-for-selected="name" selected="[[_getValueFromItem(item)]]">
 								    <paper-button class="assessment" name="Y">YES</paper-button>
@@ -190,6 +191,7 @@
 					    <td valign="top">
 					     <template is="dom-repeat" items="[[item.patterns]]">
 					     	<p><paper-checkbox on-click="_check" name="patterns" value="{{item.label}}">{{item.label}}</paper-checkbox>
+					     	<span>&nbsp;({{item.relevance}}%)</span>
 					     	<template is="dom-if" if="[[_defineMode]]">
 						     	<paper-button-group attr-for-selected="name" selected="[[_getValueFromItem(item)]]">
 								    <paper-button class="assessment" name="Y">YES</paper-button>
@@ -203,6 +205,7 @@
 					    <td valign="top">
 					     <template is="dom-repeat" items="[[item.relatedDomains]]">
 					     	<p><paper-checkbox on-click="_check" name="domains" value="{{item.label}}">{{item.label}}</paper-checkbox>
+					     	<span>&nbsp;({{item.relevance}}%)</span>
 					     	<template is="dom-if" if="[[_defineMode]]">
 					     	<paper-button-group attr-for-selected="name" selected="[[_getValueFromItem(item)]]">
 							    <paper-button class="assessment" name="Y">YES</paper-button>
@@ -216,6 +219,7 @@
 					    <td valign="top">
 					     <template is="dom-repeat" items="[[item.exampleValues]]">
 					     	<p><paper-checkbox on-click="_check" name="values" value="{{item.label}}">{{item.label}}</paper-checkbox>
+					     	<span>&nbsp;({{item.relevance}}%)</span>
 					     	<template is="dom-if" if="[[_defineMode]]">
 					     	<paper-button-group attr-for-selected="name" selected="[[_getValueFromItem(item)]]">
 							    <paper-button class="assessment" name="Y">YES</paper-button>
@@ -228,6 +232,7 @@
 					    <td valign="top">
 					     <template is="dom-repeat" items="[[item.exampleColumns]]">
 					     	<p><paper-checkbox on-click="_check" name="columns" value="{{item.label}}">{{item.label}}</paper-checkbox>
+					     	<span>&nbsp;({{item.relevance}}%)</span>
 					     	<template is="dom-if" if="[[_defineMode]]">
 					     	<paper-button-group attr-for-selected="name" selected="[[_getValueFromItem(item)]]">
 							    <paper-button class="assessment" name="Y">YES</paper-button>
@@ -261,27 +266,68 @@
 					  <tr>
 					    <td valign="top">
 					     <template is="dom-repeat" items="[[item.synonyms]]">
-					     	<p>{{item.label}}</p>
+					     	<p>{{item.label}}
+					     	<span>&nbsp;({{item.relevance}}%)</span>
+					     	<template is="dom-if" if="[[_defineMode]]">
+					     	<paper-button-group attr-for-selected="name" selected="[[_getValueFromItem(item)]]">
+							    <paper-button class="assessment" name="Y">YES</paper-button>
+							    <paper-button class="assessment" name="N">NO</paper-button>
+							    <paper-button class="assessment" name="M">MAYBE</paper-button>
+							</paper-button-group>
+							</template>
+							</p>
 					     </template>
 					    </td>
 					    <td valign="top">
 					     <template is="dom-repeat" items="[[item.patterns]]">
-						    <p>{{item.label}}</p>
+						    <p>{{item.label}}
+						    <span>&nbsp;({{item.relevance}}%)</span>
+						    <template is="dom-if" if="[[_defineMode]]">
+					     	<paper-button-group attr-for-selected="name" selected="[[_getValueFromItem(item)]]">
+							    <paper-button class="assessment" name="Y">YES</paper-button>
+							    <paper-button class="assessment" name="N">NO</paper-button>
+							    <paper-button class="assessment" name="M">MAYBE</paper-button>
+							</paper-button-group>
+							</template></p>
 					     </template>
 					    </td>
 					    <td valign="top">
 					     <template is="dom-repeat" items="[[item.relatedDomains]]">
-					     	<p>{{item.label}}</p>
+					     	<p>{{item.label}}
+					     	<span>&nbsp;({{item.relevance}}%)</span>
+					     	<template is="dom-if" if="[[_defineMode]]">
+					     	<paper-button-group attr-for-selected="name" selected="[[_getValueFromItem(item)]]">
+							    <paper-button class="assessment" name="Y">YES</paper-button>
+							    <paper-button class="assessment" name="N">NO</paper-button>
+							    <paper-button class="assessment" name="M">MAYBE</paper-button>
+							</paper-button-group>
+							</template></p>
 					     </template>
 					    </td>
 					    <td valign="top">
 					     <template is="dom-repeat" items="[[item.exampleValues]]">
-					     	<p>{{item.label}}</p>
+					     	<p>{{item.label}}
+					     	<span>&nbsp;({{item.relevance}}%)</span>
+					     	<template is="dom-if" if="[[_defineMode]]">
+					     	<paper-button-group attr-for-selected="name" selected="[[_getValueFromItem(item)]]">
+							    <paper-button class="assessment" name="Y">YES</paper-button>
+							    <paper-button class="assessment" name="N">NO</paper-button>
+							    <paper-button class="assessment" name="M">MAYBE</paper-button>
+							</paper-button-group>
+							</template></p>
 					     </template>
 					    </td>
 					    <td valign="top">
 					     <template is="dom-repeat" items="[[item.exampleColumns]]">
-					     	<p>{{item.label}}</p>
+					     	<p>{{item.label}}
+					     	<span>&nbsp;({{item.relevance}}%)</span>
+					     	<template is="dom-if" if="[[_defineMode]]">
+					     	<paper-button-group attr-for-selected="name" selected="[[_getValueFromItem(item)]]">
+							    <paper-button class="assessment" name="Y">YES</paper-button>
+							    <paper-button class="assessment" name="N">NO</paper-button>
+							    <paper-button class="assessment" name="M">MAYBE</paper-button>
+							</paper-button-group>
+							</template></p>
 					     </template>
 					    </td>
 					    
