@@ -728,7 +728,7 @@ Note: The inputs marked with '*' are mandatory inputs.
        				}
        			}
        			else if(this._fetchClustersNear){
-       				//this._facetedSearchUrl = this.importPath + 'assets/json/clusters.json';
+//        				this._facetedSearchUrl = this.importPath + 'assets/json/clusters.json';
        				if(this._paramVal){
        					obj["near"] = this._conceptId;
        					obj["filter"] = this._paramVal;
@@ -759,7 +759,7 @@ Note: The inputs marked with '*' are mandatory inputs.
  	          if(newvalue != null){
  		             this.async(function() {
  		            	var temp = {};
- 		            	var obj = {};
+ 		            //	var obj = {};
  		            	var keys = ["synonyms", "patterns", "relatedDomains", "exampleValues", "exampleColumns"];
  		            	var clusterdCols = [];
  		            	var exmplColArr = [];
@@ -780,18 +780,18 @@ Note: The inputs marked with '*' are mandatory inputs.
  		            			}
  		            		}
  		            	    temp["exampleColumns"] = exmplColArr;
- 		            		obj = this._addValidatedFields(temp);
- 		            		obj = this._addRequiredFields(obj);
- 		            		this.response = this.response.concat(obj);
+ 		            		temp = this._addValidatedFields(temp);
+ 		            		temp = this._addRequiredFields(temp);
+ 		            		this.response = this.response.concat(temp);
  		            	}
  		            	else if(this._fetchColumnsNear){
- 		            		obj = this._addValidatedFields(newvalue);
- 		            		obj = this._addRequiredFields(obj);
- 		            		this.response =  this.response.concat(obj);
+ 		            		temp = this._addValidatedFields(newvalue);
+ 		            		temp = this._addRequiredFields(temp);
+ 		            		this.response =  this.response.concat(temp);
  		            	}
  		            	else{
- 		            		obj = this._addRequiredFields(newvalue);
- 		            		this.response =  this.response.concat(obj);
+ 		            		temp = this._addRequiredFields(newvalue);
+ 		            		this.response =  this.response.concat(temp);
  		            	}
  		         		this._reset();
  		   		 	          }, 500);
