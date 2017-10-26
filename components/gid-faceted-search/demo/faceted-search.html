@@ -114,7 +114,7 @@
         api-url={{apiUrl}}
         api-token={{apiToken}}
         synonyms='{{synonyms}}' patterns='{{patterns}}'
-        domains='{{domains}}' values='{{values}}' columns='{{columns}}' mode="EXPLORE"
+        related='{{related}}' values='{{values}}' columns='{{columns}}' mode="EXPLORE"
         trigger-filter={{triggerFilter}}
         response={{response}}>
         </gid-faceted-search>
@@ -176,7 +176,7 @@
 					  <tr>
 					    <td valign="top">
 					     <template is="dom-repeat" items="[[item.synonyms]]">
-					     	<p><paper-checkbox on-click="_check" name="synonyms" value="{{item.label}}">{{item.label}}</paper-checkbox>
+					     	<p><paper-checkbox on-click="_check" name="synonyms" value="{{item.id}}">{{item.label}}</paper-checkbox>
 					     	<span>&nbsp;({{item.relevance}}%)</span>
 					     	<template is="dom-if" if="[[_defineMode]]">
 						     	<paper-button-group attr-for-selected="name" selected="[[_getValueFromItem(item)]]">
@@ -190,7 +190,7 @@
 					    </td>
 					    <td valign="top">
 					     <template is="dom-repeat" items="[[item.patterns]]">
-					     	<p><paper-checkbox on-click="_check" name="patterns" value="{{item.label}}">{{item.label}}</paper-checkbox>
+					     	<p><paper-checkbox on-click="_check" name="patterns" value="{{item.id}}">{{item.label}}</paper-checkbox>
 					     	<span>&nbsp;({{item.relevance}}%)</span>
 					     	<template is="dom-if" if="[[_defineMode]]">
 						     	<paper-button-group attr-for-selected="name" selected="[[_getValueFromItem(item)]]">
@@ -204,7 +204,7 @@
 					    </td>
 					    <td valign="top">
 					     <template is="dom-repeat" items="[[item.relatedDomains]]">
-					     	<p><paper-checkbox on-click="_check" name="domains" value="{{item.label}}">{{item.label}}</paper-checkbox>
+					     	<p><paper-checkbox on-click="_check" name="related" value="{{item.id}}">{{item.label}}</paper-checkbox>
 					     	<span>&nbsp;({{item.relevance}}%)</span>
 					     	<template is="dom-if" if="[[_defineMode]]">
 					     	<paper-button-group attr-for-selected="name" selected="[[_getValueFromItem(item)]]">
@@ -218,7 +218,7 @@
 					    </td>
 					    <td valign="top">
 					     <template is="dom-repeat" items="[[item.exampleValues]]">
-					     	<p><paper-checkbox on-click="_check" name="values" value="{{item.label}}">{{item.label}}</paper-checkbox>
+					     	<p><paper-checkbox on-click="_check" name="values" value="{{item.id}}">{{item.label}}</paper-checkbox>
 					     	<span>&nbsp;({{item.relevance}}%)</span>
 					     	<template is="dom-if" if="[[_defineMode]]">
 					     	<paper-button-group attr-for-selected="name" selected="[[_getValueFromItem(item)]]">
@@ -231,7 +231,7 @@
 					    </td>
 					    <td valign="top">
 					     <template is="dom-repeat" items="[[item.exampleColumns]]">
-					     	<p><paper-checkbox on-click="_check" name="columns" value="{{item.label}}">{{item.label}}</paper-checkbox>
+					     	<p><paper-checkbox on-click="_check" name="columns" value="{{item.id}}">{{item.label}}</paper-checkbox>
 					     	<span>&nbsp;({{item.relevance}}%)</span>
 					     	<template is="dom-if" if="[[_defineMode]]">
 					     	<paper-button-group attr-for-selected="name" selected="[[_getValueFromItem(item)]]">
@@ -405,8 +405,8 @@
            	   notify: true,
            	   value: []
            },
-           /*Array for related domains parameter*/
-           domains: {
+           /*Array for related related parameter*/
+           related: {
            	   type: Array,
            	   notify: true,
            	   value: []
@@ -536,7 +536,7 @@
         	 this._facetedSearchResult = [];
         	 this.synonyms =  '';
         	 this.patterns = [];
-        	 this.domains = [];
+        	 this.related = [];
         	 this.values = [];
         	 this.columns = [];
         	 this._fetchConcepts = false;

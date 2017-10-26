@@ -5,6 +5,7 @@
 <link rel="import" href="../gid-api/gid-api.html">
 <link rel="import" href="../gid-concept-details/gid-concept-details.html">
 <script src="../lodash/dist/lodash.min.js"></script>
+<script src="../polymer-global-variables/dist/polymer-global-variables.js" charset="utf-8"></script>
 <!--
 ## gid-faceted-search
 
@@ -499,9 +500,10 @@ Note: The inputs marked with '*' are mandatory inputs.
 	           	   value: {
 		           		"synonyms" : "synonyms",
 		           		"patterns"	: "patterns",
-		           		"relatedDomains" : "domains",
-		           		"domains" : "domains",
+		           		"relatedDomains" : "related",
+		           		"related" : "related",
 		           		"exampleValues" : "values",
+		           		"values" : "values",
 		           		"exampleColumns" : "columns",
 		           		"columns" : "columns"
 	           	   }
@@ -525,7 +527,7 @@ Note: The inputs marked with '*' are mandatory inputs.
 		           	   value: []
 	           },
 	           /*Array for related domains parameter*/
-	           domains: {
+	           related: {
 		           	   type: Array,
 		           	   notify: true,
 		           	   value: []
@@ -657,12 +659,14 @@ Note: The inputs marked with '*' are mandatory inputs.
                }
         },
         
+        ready: function (){
+        	
+        },
+        
          /* Reset method */
          _reset: function () {
         	// this.conceptdetails = [];
         	 this.triggerFilter = false;
-        	 this._fetchColumnsNear =  false;
-        	 this._fetchClustersNear =  false;
         	 this._paramVal = '';
       		 this._apiEntity = '';
              this._path = '';
@@ -671,39 +675,41 @@ Note: The inputs marked with '*' are mandatory inputs.
          /* Observer of concept details array */
          _conceptDetailsArrObserver: function () {
         	 var that = this;
+        	 Polymer.globalsManager.set('_fetchColumnsNear', false);
+        	 Polymer.globalsManager.set('_fetchClustersNear', false);
         	 if (this.conceptdetails.length > 0) {
+        		 Polymer.globalsManager.set('conceptdetails',  this.conceptdetails[0]);
         		 this.conceptdetails.forEach( function(i) { 
-        			 that._conceptLabel =  i.label;
-        			 that._conceptId = i.id;
+        			 Polymer.globalsManager.set('_conceptLabel', i.label);
+        			 Polymer.globalsManager.set('_conceptId', i.id);
         			 if(i.exampleColumns.length === 0){
         				 if (!that.apiUrl) {
         					 //TODO
                			}
                  		else {
-                 			that._fetchColumnsNear =  true;
-                 			that.triggerFilter = true;
+                 			Polymer.globalsManager.set('_fetchColumnsNear', true);
+                 			that._initFilter();
                   		}
         			 }
         			 else{
-        				 that._fetchClustersNear =  true;
-        				 that.triggerFilter = true;
+        				 Polymer.globalsManager.set('_fetchClustersNear', true);
+        				 that._initFilter();
         			 }
         		} );
          	}
-				
          },
          /* Set pathkey  and entity for faceted column search */
          _set: function(){
         	 this._apiEntity = '';
              this._path = '';
         	 this._pathKey =  'default';
-        	 if(this._fetchClustersNear){
-        		 //TODO
+        	 if(Polymer.globalsManager.get('_fetchClustersNear')){
         		 this._apiEntity = 'CLUSTERS';
         	 }
-        	 else if(this._fetchColumnsNear || this.triggerFilter){
+        	 else  if(Polymer.globalsManager.get('_fetchColumnsNear')){
         		 this._apiEntity = 'FACETED-COLUMNS';
         	 }
+        	 
          },
          /* Observer for api path */
          _pathReceived: function(){
@@ -718,28 +724,23 @@ Note: The inputs marked with '*' are mandatory inputs.
          		}
        			this._facetedSearchUrl = this.apiUrl + res.join("");
        			var obj = {};
-       			if(this._fetchColumnsNear){
+       			if(Polymer.globalsManager.get('_fetchColumnsNear')){
        				if(this._paramVal){
-       					obj["near"] = this._conceptLabel;
+       					obj["near"] = Polymer.globalsManager.get('_conceptLabel');
        					obj["filter"] = this._paramVal;
        				}
        				else{
-       					obj["near"] = this._conceptLabel;
+       					obj["near"] = Polymer.globalsManager.get('_conceptLabel');
        				}
        			}
-       			else if(this._fetchClustersNear){
+       			else if(Polymer.globalsManager.get('_fetchClustersNear')){
 //        				this._facetedSearchUrl = this.importPath + 'assets/json/clusters.json';
        				if(this._paramVal){
-       					obj["near"] = this._conceptId;
+       					obj["near"] = Polymer.globalsManager.get('_conceptId');
        					obj["filter"] = this._paramVal;
        				}
        				else{
-       					obj["near"] = this._conceptId;
-       				}
-       			}
-       			else{
-       				if(this._paramVal){
-       					obj["filter"] = this._paramVal; 
+       					obj["near"] = Polymer.globalsManager.get('_conceptId');
        				}
        			}
        			this._facetedSearchParams = JSON.stringify(obj);
@@ -756,6 +757,7 @@ Note: The inputs marked with '*' are mandatory inputs.
          /* Success response handler */
          _facetedSearchResponseReceived : function(newvalue, oldvalue){
         	 this.response = [];
+        	 var conceptdetails = Polymer.globalsManager.get('conceptdetails');
  	          if(newvalue != null){
  		             this.async(function() {
  		            	var temp = {};
@@ -765,7 +767,7 @@ Note: The inputs marked with '*' are mandatory inputs.
  		            	for(var idx=0; idx<keys.length; idx++){
  		            		temp[keys[idx]] = [];
  		            	}
- 		            	if(this._fetchClustersNear){
+ 		            	if(Polymer.globalsManager.get('_fetchClustersNear')){
  		            		temp["synonyms"] = newvalue["synonyms"];
  		            		for(var i = 0; i<newvalue["clusters"].length; i++){
  		            			clusterdCols = newvalue["clusters"][i]["columns"];
@@ -779,17 +781,13 @@ Note: The inputs marked with '*' are mandatory inputs.
  		            			}
  		            		}
  		            	    temp["exampleColumns"] = exmplColArr;
- 		            		temp = this._addValidatedFields(temp);
- 		            		temp = this._addRequiredFields(temp);
+ 		            		temp = this._addValidatedFields(temp, conceptdetails);
+ 		            		temp = this._addRequiredFields(temp, conceptdetails);
  		            		this.response = this.response.concat(temp);
  		            	}
- 		            	else if(this._fetchColumnsNear){
- 		            		temp = this._addValidatedFields(newvalue);
- 		            		temp = this._addRequiredFields(temp);
- 		            		this.response =  this.response.concat(temp);
- 		            	}
- 		            	else{
- 		            		temp = this._addRequiredFields(newvalue);
+ 		            	else if(Polymer.globalsManager.get('_fetchColumnsNear')){
+ 		            		temp = this._addValidatedFields(newvalue, conceptdetails);
+ 		            		temp = this._addRequiredFields(temp, conceptdetails);
  		            		this.response =  this.response.concat(temp);
  		            	}
  		         		this._reset();
@@ -807,12 +805,12 @@ Note: The inputs marked with '*' are mandatory inputs.
         	  return exmplColArr;
           },
           /* Add all 'Y' marked assessment from previous domain definition in clusters and columns response */
-          _addValidatedFields: function(obj){
+          _addValidatedFields: function(obj, conceptdetails){
         	  for(var key in obj){
-	        	  for(var i=0; i<this.conceptdetails[0][key].length; i++){
-							if(typeof(this.conceptdetails[0][key]) === "object"){
-								if(this.conceptdetails[0][key][i]["assessment"] === 'Y'){
-									obj[key] = obj[key].concat(this.conceptdetails[0][key][i]);
+	        	  for(var i=0; i<conceptdetails[key].length; i++){
+							if(typeof(conceptdetails[key]) === "object"){
+								if(conceptdetails[key][i]["assessment"] === 'Y'){
+									obj[key] = obj[key].concat(conceptdetails[key][i]);
 								}
 							}
 						}
@@ -821,19 +819,18 @@ Note: The inputs marked with '*' are mandatory inputs.
           },
           
           /* Add assessment and relevance field in response */
-          _addRequiredFields:  function(obj){
-        	  if(this._fetchColumnsNear || this._fetchClustersNear){
+          _addRequiredFields:  function(obj, conceptdetails){
         		  var foundMatch = false;
             	  for (var key in obj) {
            			for(var index=0; index<obj[key].length; index++){
            				foundMatch = false;
            				if(typeof(obj[key]) === "object"){
-           					if(this.conceptdetails[0][key].length > 0 ){
-           						for(var i=0; i<this.conceptdetails[0][key].length; i++){
-               						if(typeof(this.conceptdetails[0][key]) === "object"){
-        	       						if(obj[key][index]["id"] === this.conceptdetails[0][key][i]["id"]){
-        	       							obj[key][index]["assessment"] = this.conceptdetails[0][key][i]["assessment"];
-        	       							obj[key][index]["relevance"] = this.conceptdetails[0][key][i]["relevance"];
+           					if(conceptdetails[key].length > 0 ){
+           						for(var i=0; i<conceptdetails[key].length; i++){
+               						if(typeof(conceptdetails[key]) === "object"){
+        	       						if(obj[key][index]["id"] === conceptdetails[key][i]["id"]){
+        	       							obj[key][index]["assessment"] = conceptdetails[key][i]["assessment"];
+        	       							obj[key][index]["relevance"] = conceptdetails[key][i]["relevance"];
         	       							foundMatch = true;
         	       							break;
         	       						}
@@ -852,14 +849,6 @@ Note: The inputs marked with '*' are mandatory inputs.
            				}
            			}
            		}
-        	  }
-        	  else{
-        		  for (var key in obj) {
-        			  for(var index=0; index<obj[key].length; index++){
-        				  obj[key][index]["assessment"] = 'M';
-        			  }
-        		  }
-        	  }
         	for (var key in obj){
         		obj[key] = _.uniqBy(obj[key], "id"); 
         	}
@@ -876,6 +865,41 @@ Note: The inputs marked with '*' are mandatory inputs.
     		   		 	          }, 500);
     	          }
           },
+          /* Initial filtering */
+          _initFilter: function(){
+        	  this._paramVal = '';
+    		  var j = 0;
+    		  var keys  = [];
+			  for(var key in this._paramsObj){
+				  keys = keys.concat(key); 
+        		}
+			  for (var i in keys){
+  				if(this.conceptdetails[0].hasOwnProperty(keys[i])){
+                		if(this.conceptdetails[0][keys[i]].length > 0){
+				        	    	var notVerified = [];
+									for(var index in this.conceptdetails[0][keys[i]]){
+										if(this.conceptdetails[0][keys[i]][index]["assessment"] === 'N'){
+											notVerified = notVerified.concat(this.conceptdetails[0][keys[i]][index]["id"])
+										}
+    		    					
+    		    					}
+									if(notVerified.length > 0){
+										if(j>0){
+		                      			  this._paramVal = this._paramVal + " and " + "(";
+		                      			}
+										this._paramVal = this._paramVal + this._paramsObj[keys[i]] + ' '+ "not ['" + notVerified.join("','")+ "']";
+									}
+    		    			if(j>0 && notVerified.length > 0){
+    		    				this._paramVal = this._paramVal + ')';
+    		    			}
+    		    			j = j+1;
+                	
+                }
+  			  }
+  			  }
+			  Polymer.globalsManager.set('initFilterParam',this._paramVal);
+			  this._set();
+          },
           /*Observer of 'triggerFilter' flag*/
           _observeTriggerFilter:  function(){
         	  if(this.triggerFilter){
@@ -885,34 +909,6 @@ Note: The inputs marked with '*' are mandatory inputs.
     			  for(var key in this._paramsObj){
     				  keys = keys.concat(key); 
             		}
-        		  if(this._fetchColumnsNear || this._fetchClustersNear){
-        			  for (var i in keys){
-        				if(this.conceptdetails[0].hasOwnProperty(keys[i])){
-                      		if(this.conceptdetails[0][keys[i]].length > 0){
-					        	    	var notVerified = [];
-										for(var index in this.conceptdetails[0][keys[i]]){
-											if(this.conceptdetails[0][keys[i]][index]["assessment"] === 'N'){
-												notVerified = notVerified.concat(this.conceptdetails[0][keys[i]][index]["label"])
-											}
-          		    					
-          		    					}
-										if(notVerified.length > 0){
-											if(j>0){
-			                      				this._paramVal = this._paramVal + " and " + "(";
-			                      			}
-											this._paramVal = this._paramVal + this._paramsObj[keys[i]] + ' '+ "not ";
-											this._paramVal = this._paramVal + "['" + notVerified.join("','")+ "']";
-										}
-          		    			if(j>0 && notVerified.length > 0){
-          		    				this._paramVal = this._paramVal + ')';
-          		    			}
-          		    			j = j+1;
-                      	
-                      }
-        			  }
-        			  }
-        		  }
-        		  else{
         			  for (var i in keys){
         				 if(this[keys[i]]){
                         	if(this[keys[i]].length > 0){
@@ -926,12 +922,10 @@ Note: The inputs marked with '*' are mandatory inputs.
             		    				this._paramVal = this._paramVal + this._paramsObj[keys[i]] + ' ';
             		    			}
             		    			if(typeof(this[this._paramsObj[keys[i]]]) === "string"){
-            		    				this._paramVal = this._paramVal + "eq ";
-            		    				this._paramVal = this._paramVal + "'" + this[this._paramsObj[keys[i]]] + "'";
+            		    				this._paramVal = this._paramVal + "eq '"+ this[this._paramsObj[keys[i]]] + "'";
             		    			}      		    				
             		    			else{
-            		    					this._paramVal = this._paramVal + "every ";
-            		    				this._paramVal = this._paramVal + "['" + this[this._paramsObj[keys[i]]].join("','")+ "']";
+           		    					this._paramVal = this._paramVal + "every ['" + this[this._paramsObj[keys[i]]].join("','")+ "']";
             		    			}
             		    			if(j>0){
             		    				this._paramVal = this._paramVal + ')';
@@ -941,7 +935,7 @@ Note: The inputs marked with '*' are mandatory inputs.
                         	
         				 }
                         }
-        		  }
+        		  this._paramVal = this._paramVal + ' and ' + Polymer.globalsManager.get('initFilterParam');
                   this._set();
         	  }
         	 
