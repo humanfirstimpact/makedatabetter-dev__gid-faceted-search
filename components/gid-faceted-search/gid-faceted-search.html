@@ -734,7 +734,7 @@ Note: The inputs marked with '*' are mandatory inputs.
        				}
        			}
        			else if(Polymer.globalsManager.get('_fetchClustersNear')){
-//        				this._facetedSearchUrl = this.importPath + 'assets/json/clusters.json';
+       				this._facetedSearchUrl = this.importPath + 'assets/json/clusters.json';
        				if(this._paramVal){
        					obj["near"] = Polymer.globalsManager.get('_conceptId');
        					obj["filter"] = this._paramVal;
@@ -865,7 +865,7 @@ Note: The inputs marked with '*' are mandatory inputs.
     		   		 	          }, 500);
     	          }
           },
-          /* Initial filtering */
+          /* Initial filtering for filtering out the values whose assessment is 'NO' */
           _initFilter: function(){
         	  this._paramVal = '';
     		  var j = 0;
@@ -879,7 +879,12 @@ Note: The inputs marked with '*' are mandatory inputs.
 				        	    	var notVerified = [];
 									for(var index in this.conceptdetails[0][keys[i]]){
 										if(this.conceptdetails[0][keys[i]][index]["assessment"] === 'N'){
-											notVerified = notVerified.concat(this.conceptdetails[0][keys[i]][index]["id"])
+											if(keys[i] === "exampleColumns"){
+												notVerified = notVerified.concat(this.conceptdetails[0][keys[i]][index]["id"]);
+											}
+											else{
+												notVerified = notVerified.concat(this.conceptdetails[0][keys[i]][index]["label"]);
+											}
 										}
     		    					
     		    					}

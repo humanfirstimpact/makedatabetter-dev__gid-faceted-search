@@ -176,7 +176,7 @@
 					  <tr>
 					    <td valign="top">
 					     <template is="dom-repeat" items="[[item.synonyms]]">
-					     	<p><paper-checkbox on-click="_check" name="synonyms" value="{{item.id}}">{{item.label}}</paper-checkbox>
+					     	<p><paper-checkbox on-click="_check" name="synonyms" value="{{item.label}}">{{item.label}}</paper-checkbox>
 					     	<span>&nbsp;({{item.relevance}}%)</span>
 					     	<template is="dom-if" if="[[_defineMode]]">
 						     	<paper-button-group attr-for-selected="name" selected="[[_getValueFromItem(item)]]">
@@ -190,7 +190,7 @@
 					    </td>
 					    <td valign="top">
 					     <template is="dom-repeat" items="[[item.patterns]]">
-					     	<p><paper-checkbox on-click="_check" name="patterns" value="{{item.id}}">{{item.label}}</paper-checkbox>
+					     	<p><paper-checkbox on-click="_check" name="patterns" value="{{item.label}}">{{item.label}}</paper-checkbox>
 					     	<span>&nbsp;({{item.relevance}}%)</span>
 					     	<template is="dom-if" if="[[_defineMode]]">
 						     	<paper-button-group attr-for-selected="name" selected="[[_getValueFromItem(item)]]">
@@ -204,7 +204,7 @@
 					    </td>
 					    <td valign="top">
 					     <template is="dom-repeat" items="[[item.relatedDomains]]">
-					     	<p><paper-checkbox on-click="_check" name="related" value="{{item.id}}">{{item.label}}</paper-checkbox>
+					     	<p><paper-checkbox on-click="_check" name="related" value="{{item.label}}">{{item.label}}</paper-checkbox>
 					     	<span>&nbsp;({{item.relevance}}%)</span>
 					     	<template is="dom-if" if="[[_defineMode]]">
 					     	<paper-button-group attr-for-selected="name" selected="[[_getValueFromItem(item)]]">
@@ -218,7 +218,7 @@
 					    </td>
 					    <td valign="top">
 					     <template is="dom-repeat" items="[[item.exampleValues]]">
-					     	<p><paper-checkbox on-click="_check" name="values" value="{{item.id}}">{{item.label}}</paper-checkbox>
+					     	<p><paper-checkbox on-click="_check" name="values" value="{{item.label}}">{{item.label}}</paper-checkbox>
 					     	<span>&nbsp;({{item.relevance}}%)</span>
 					     	<template is="dom-if" if="[[_defineMode]]">
 					     	<paper-button-group attr-for-selected="name" selected="[[_getValueFromItem(item)]]">
