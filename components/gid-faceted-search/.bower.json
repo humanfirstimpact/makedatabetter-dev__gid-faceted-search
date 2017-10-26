@@ -33,11 +33,11 @@
     "lodash": "4.17.4",
     "paper-button": "^1.0.0"
   },
-  "_release": "fdcb39c941",
+  "_release": "11b616fc2c",
   "_resolution": {
     "type": "branch",
     "branch": "master",
-    "commit": "fdcb39c941597705ec61a5455856a94abda288cd"
+    "commit": "11b616fc2cf170da96c8ec4eef6108e886799601"
   },
   "_source": "https://github.com/makedatabetter-dev/gid-faceted-search.git",
   "_target": "*",

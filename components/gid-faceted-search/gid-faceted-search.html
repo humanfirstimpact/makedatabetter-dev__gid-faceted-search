@@ -677,8 +677,7 @@ Note: The inputs marked with '*' are mandatory inputs.
         			 that._conceptId = i.id;
         			 if(i.exampleColumns.length === 0){
         				 if (!that.apiUrl) {
-        					 that._facetedSearchUrl = that.importPath + 'assets/json/concept-details.json';
-        					 that._facetedSearchTimeout =  that._facetedSearchTimeout - 1;
+        					 //TODO
                			}
                  		else {
                  			that._fetchColumnsNear =  true;
@@ -729,7 +728,7 @@ Note: The inputs marked with '*' are mandatory inputs.
        				}
        			}
        			else if(this._fetchClustersNear){
-       				this._facetedSearchUrl = this.importPath + 'assets/json/clusters.json';
+       				//this._facetedSearchUrl = this.importPath + 'assets/json/clusters.json';
        				if(this._paramVal){
        					obj["near"] = this._conceptId;
        					obj["filter"] = this._paramVal;
@@ -754,7 +753,7 @@ Note: The inputs marked with '*' are mandatory inputs.
     			}
     			this._facetedSearchTimeout =  this._facetedSearchTimeout - 1;
          },
-         /* Example columns success response handler */
+         /* Success response handler */
          _facetedSearchResponseReceived : function(newvalue, oldvalue){
         	 this.response = [];
  	          if(newvalue != null){
@@ -868,7 +867,7 @@ Note: The inputs marked with '*' are mandatory inputs.
         	
         	return obj;
           },
-          /* Example columns error response handler */
+          /* Error response handler */
           _facetedSearchErrorReceived : function(newvalue, oldvalue){
         	  this.response = [];
     	          if(newvalue != null){
