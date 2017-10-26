@@ -729,7 +729,7 @@ Note: The inputs marked with '*' are mandatory inputs.
        				}
        			}
        			else if(this._fetchClustersNear){
-       	//			this._facetedSearchUrl = this.importPath + 'assets/json/clusters.json';
+       				this._facetedSearchUrl = this.importPath + 'assets/json/clusters.json';
        				if(this._paramVal){
        					obj["near"] = this._conceptId;
        					obj["filter"] = this._paramVal;
@@ -762,20 +762,25 @@ Note: The inputs marked with '*' are mandatory inputs.
  		            	var temp = {};
  		            	var obj = {};
  		            	var keys = ["synonyms", "patterns", "relatedDomains", "exampleValues", "exampleColumns"];
+ 		            	var clusterdCols = [];
+ 		            	var exmplColArr = [];
  		            	for(var idx=0; idx<keys.length; idx++){
  		            		temp[keys[idx]] = [];
  		            	}
  		            	if(this._fetchClustersNear){
  		            		temp["synonyms"] = newvalue["synonyms"];
  		            		for(var i = 0; i<newvalue["clusters"].length; i++){
- 		            			for(var j=0; j<newvalue["clusters"][i]["columns"].length; j++){
- 		            				for(var key in newvalue["clusters"][i]["columns"][j]){
- 		            					if(typeof(newvalue["clusters"][i]["columns"][j][key]) === "object"){
- 		            						temp[key] = temp[key].concat(newvalue["clusters"][i]["columns"][j][key]);
+ 		            			clusterdCols = newvalue["clusters"][i]["columns"];
+ 		            			for(var j=0; j<clusterdCols.length; j++){
+ 		            				exmplColArr = this._addExampleColumns(clusterdCols, exmplColArr, j);
+		            				for(var key in clusterdCols[j]){
+ 		            					if(typeof(clusterdCols[j][key]) === "object"){
+ 		            						temp[key] = temp[key].concat(clusterdCols[j][key]);
  		            					}
  	 	 		            		}
  		            			}
  		            		}
+ 		            	    temp["exampleColumns"] = exmplColArr;
  		            		obj = this._addValidatedFields(temp);
  		            		obj = this._addRequiredFields(obj);
  		            		this.response = this.response.concat(obj);
@@ -793,6 +798,15 @@ Note: The inputs marked with '*' are mandatory inputs.
  		   		 	          }, 500);
  	          }
           	
+          },
+          /* Adding example columns to response */
+          _addExampleColumns:  function(clusterdCols, exmplColArr, counter){
+        	  exmplColArr.push({
+        	        id: clusterdCols[counter].id,
+        	        label: clusterdCols[counter].label,
+        	        relevance: clusterdCols[counter].relevance
+        	    });
+        	  return exmplColArr;
           },
           /* Add all 'Y' marked assessment from previous domain definition in clusters and columns response */
           _addValidatedFields: function(obj){
