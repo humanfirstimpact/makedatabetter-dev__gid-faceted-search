@@ -734,7 +734,7 @@ Note: The inputs marked with '*' are mandatory inputs.
        				}
        			}
        			else if(Polymer.globalsManager.get('_fetchClustersNear')){
-       	//			this._facetedSearchUrl = this.importPath + 'assets/json/clusters.json';
+       		//		this._facetedSearchUrl = this.importPath + 'assets/json/clusters.json';
        				if(this._paramVal){
        					obj["near"] = Polymer.globalsManager.get('_conceptId');
        					obj["filter"] = this._paramVal;
@@ -768,28 +768,52 @@ Note: The inputs marked with '*' are mandatory inputs.
  		            		temp[keys[idx]] = [];
  		            	}
  		            	if(Polymer.globalsManager.get('_fetchClustersNear')){
- 		            		temp["synonyms"] = newvalue["synonyms"];
+	            			if(!newvalue.hasOwnProperty("synonyms")){
+	            				if(this.triggerFilter){
+	            					/* When filtering, remove all object from final response which are selected */
+ 		            				delete temp["synonyms"];
+ 		             			}
+ 		            		}
+	            			else{
+	            				temp["synonyms"] = newvalue["synonyms"];
+	            			}
  		            		for(var i = 0; i<newvalue["clusters"].length; i++){
  		            			clusterdCols = newvalue["clusters"][i]["columns"];
  		            			for(var j=0; j<clusterdCols.length; j++){
- 		            				exmplColArr = this._addExampleColumns(clusterdCols, exmplColArr, j);
+ 		            					exmplColArr = this._addExampleColumns(clusterdCols, exmplColArr, j);
 		            				for(var key in clusterdCols[j]){
- 		            					if(typeof(clusterdCols[j][key]) === "object"){
- 		            						temp[key] = temp[key].concat(clusterdCols[j][key]);
- 		            					}
+		            					if(!clusterdCols[j].hasOwnProperty(key)){
+		            						if(this.triggerFilter){
+		            							/* When filtering, remove all object from final response which are selected */
+		            							delete temp[key];
+		            						}
+		     		            		}
+		            					else{
+		            						if(typeof(clusterdCols[j][key]) === "object"){
+	 		            						temp[key] = temp[key].concat(clusterdCols[j][key]);
+	 		            					}
+		            					}
+		            					
  	 	 		            		}
  		            			}
  		            		}
- 		            	    temp["exampleColumns"] = exmplColArr;
- 		            		temp = this._addValidatedFields(temp, conceptdetails);
- 		            		temp = this._addRequiredFields(temp, conceptdetails);
- 		            		this.response = this.response.concat(temp);
+ 		            		temp["exampleColumns"] = exmplColArr;
+ 		            		/* When filtering (faceted search), do not add previous domain definition to response for clusters or columns call */
+ 		            	    if(!this.triggerFilter){
+ 		            		  temp = this._addValidatedFields(temp, conceptdetails);
+		            		}
  		            	}
  		            	else if(Polymer.globalsManager.get('_fetchColumnsNear')){
- 		            		temp = this._addValidatedFields(newvalue, conceptdetails);
- 		            		temp = this._addRequiredFields(temp, conceptdetails);
- 		            		this.response =  this.response.concat(temp);
+ 		            		/* When filtering (faceted search), do not add previous domain definition to response for clusters or columns call */
+ 		            		if(!this.triggerFilter){
+ 		            			temp = this._addValidatedFields(newvalue, conceptdetails);
+ 		            		}
  		            	}
+ 		            	temp = this._addRequiredFields(temp, conceptdetails);
+		                this.response =  this.response.concat(temp);
+		                if(localStorage.getItem('debug')){
+		                	console.log(this.response);
+		                }
  		         		this._reset();
  		   		 	          }, 500);
  	          }
@@ -825,26 +849,28 @@ Note: The inputs marked with '*' are mandatory inputs.
            			for(var index=0; index<obj[key].length; index++){
            				foundMatch = false;
            				if(typeof(obj[key]) === "object"){
-           					if(conceptdetails[key].length > 0 ){
-           						for(var i=0; i<conceptdetails[key].length; i++){
-               						if(typeof(conceptdetails[key]) === "object"){
-        	       						if(obj[key][index]["id"] === conceptdetails[key][i]["id"]){
-        	       							obj[key][index]["assessment"] = conceptdetails[key][i]["assessment"];
-        	       							obj[key][index]["relevance"] = conceptdetails[key][i]["relevance"];
-        	       							foundMatch = true;
-        	       							break;
-        	       						}
-        	       						else{
-        	       							obj[key][index]["assessment"] = 'M';
-        	       						}
-               						}
-               					}
-           					}
-           					else{
+           					if(this.triggerFilter){
            						obj[key][index]["assessment"] = 'M';
            					}
-           					if(foundMatch){
-           						break;
+           					else{
+           						if(conceptdetails[key].length > 0 ){
+               						for(var i=0; i<conceptdetails[key].length; i++){
+                   						if(typeof(conceptdetails[key]) === "object"){
+            	       						if(obj[key][index]["id"] === conceptdetails[key][i]["id"]){
+            	       							obj[key][index]["assessment"] = conceptdetails[key][i]["assessment"];
+            	       							obj[key][index]["relevance"] = conceptdetails[key][i]["relevance"];
+            	       							foundMatch = true;
+            	       							break;
+            	       						}
+            	       						else{
+            	       							obj[key][index]["assessment"] = 'M';
+            	       						}
+                   						}
+                   					}
+               					}
+               					if(foundMatch){
+               						break;
+               					}
            					}
            				}
            			}
