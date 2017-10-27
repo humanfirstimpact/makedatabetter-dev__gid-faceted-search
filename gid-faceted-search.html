@@ -768,31 +768,19 @@ Note: The inputs marked with '*' are mandatory inputs.
  		            		temp[keys[idx]] = [];
  		            	}
  		            	if(Polymer.globalsManager.get('_fetchClustersNear')){
-	            			if(!newvalue.hasOwnProperty("synonyms")){
-	            				if(this.triggerFilter){
-	            					/* When filtering, remove all object from final response which are selected */
- 		            				delete temp["synonyms"];
- 		             			}
- 		            		}
-	            			else{
+	            			if(newvalue.hasOwnProperty("synonyms")){
 	            				temp["synonyms"] = newvalue["synonyms"];
-	            			}
+ 		            		}
  		            		for(var i = 0; i<newvalue["clusters"].length; i++){
  		            			clusterdCols = newvalue["clusters"][i]["columns"];
  		            			for(var j=0; j<clusterdCols.length; j++){
  		            					exmplColArr = this._addExampleColumns(clusterdCols, exmplColArr, j);
 		            				for(var key in clusterdCols[j]){
-		            					if(!clusterdCols[j].hasOwnProperty(key)){
-		            						if(this.triggerFilter){
-		            							/* When filtering, remove all object from final response which are selected */
-		            							delete temp[key];
-		            						}
-		     		            		}
-		            					else{
+		            					if(clusterdCols[j].hasOwnProperty(key)){
 		            						if(typeof(clusterdCols[j][key]) === "object"){
 	 		            						temp[key] = temp[key].concat(clusterdCols[j][key]);
 	 		            					}
-		            					}
+		     		            		}
 		            					
  	 	 		            		}
  		            			}
@@ -810,6 +798,26 @@ Note: The inputs marked with '*' are mandatory inputs.
  		            		}
  		            	}
  		            	temp = this._addRequiredFields(temp, conceptdetails);
+ 		            	if(this.triggerFilter){
+ 		            		 var arr  = [];
+ 		      			  	 for(var a in this._paramsObj){
+ 		      				  arr = arr.concat(this._paramsObj[a]); 
+ 		              		}
+ 		      			  	for(var k in arr){
+ 	 		            		if(!_.isEmpty(this[arr[k]])){
+ 	 		            			$.each(this._paramsObj, function (inx, val) {
+ 	 		            			    if (val === arr[k]) {
+ 	 		            			    	if(temp.hasOwnProperty(inx)){
+ 	 		            			    		delete temp[inx];
+ 	 		            			    	}
+ 	 		            			    }
+
+ 	 		            			})
+ 	 		            			
+ 	 		            		}
+ 	 		            	}
+ 		            	}
+ 		            	
 		                this.response =  this.response.concat(temp);
 		                if(localStorage.getItem('debug')){
 		                	console.log(this.response);
