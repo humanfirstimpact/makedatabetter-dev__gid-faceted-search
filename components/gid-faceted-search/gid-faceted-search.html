@@ -817,8 +817,19 @@ Note: The inputs marked with '*' are mandatory inputs.
  	 		            		}
  	 		            	}
  		            	}
- 		            	
-		                this.response =  this.response.concat(temp);
+ 		            	if(Polymer.globalsManager.get('_fetchClustersNear')){
+                            //if cluster near do sort by descending
+                            var sorted = {};
+                            for (var facetType in temp) {
+                                if (temp.hasOwnProperty(facetType)) {
+                                    sorted[facetType] = _.sortBy(temp[facetType], ['relevance']).reverse();
+                                }
+                            }
+                            this.response =  this.response.concat(sorted);
+                        }else{
+                            //else sort is not needed
+                            this.response =  this.response.concat(temp);
+                        }
 		                if(localStorage.getItem('debug')){
 		                	console.log(this.response);
 		                }
