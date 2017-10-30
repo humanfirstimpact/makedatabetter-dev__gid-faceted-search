@@ -795,7 +795,9 @@ Note: The inputs marked with '*' are mandatory inputs.
  		            		/* When filtering (faceted search), do not add previous domain definition to response for clusters or columns call */
  		            		if(!this.triggerFilter){
  		            			temp = this._addValidatedFields(newvalue, conceptdetails);
- 		            		}
+ 		            		}else{
+                                temp = newvalue;
+                            }
  		            	}
  		            	temp = this._addRequiredFields(temp, conceptdetails);
  		            	if(this.triggerFilter){
@@ -816,22 +818,23 @@ Note: The inputs marked with '*' are mandatory inputs.
  	 		            			
  	 		            		}
  	 		            	}
- 		            	}
- 		            	if(Polymer.globalsManager.get('_fetchClustersNear')){
-                            //if cluster near do sort by descending
-                            var sorted = {};
-                            for (var facetType in temp) {
-                                if (temp.hasOwnProperty(facetType)) {
-                                    sorted[facetType] = _.sortBy(temp[facetType], ['relevance']).reverse();
-                                }
-                            }
-                            this.response =  this.response.concat(sorted);
-                        }else{
-                            //else sort is not needed
-                            this.response =  this.response.concat(temp);
                         }
+                         if(Polymer.globalsManager.get('_fetchClustersNear')){
+                             //if cluster near do sort by descending
+                             var sorted = {};
+                             for (var facetType in temp) {
+                                 if (temp.hasOwnProperty(facetType)) {
+                                     sorted[facetType] = _.sortBy(temp[facetType], ['relevance']).reverse();
+                                 }
+                             }
+                             this.response =  this.response.concat(sorted);
+                         }else{
+                             //else sort is not needed
+                             this.response =  this.response.concat(temp);
+                         }
+
 		                if(localStorage.getItem('debug')){
-		                	console.log(this.response);
+		                	console.log("final response = " + JSON.stringify(this.response));
 		                }
  		         		this._reset();
  		   		 	          }, 500);
@@ -887,6 +890,9 @@ Note: The inputs marked with '*' are mandatory inputs.
                    						}
                    					}
                					}
+           						else{
+           							obj[key][index]["assessment"] = 'M';
+           						}
                					if(foundMatch){
                						break;
                					}
@@ -904,10 +910,30 @@ Note: The inputs marked with '*' are mandatory inputs.
           _facetedSearchErrorReceived : function(newvalue, oldvalue){
         	  this.response = [];
     	          if(newvalue != null){
-    		             this.async(function() {
-    		         		this.response =  this.response.concat(newvalue.response);
-    		         		this._reset();
-    		   		 	          }, 500);
+                      this.async(function () {
+                          if(newvalue.status==404){
+                              var res={};
+                              if(this.synonyms==""){
+                                  res["synonyms"]=[];
+                              }
+                              if(this.patterns.length==0){
+                                  res["patterns"]=[];
+                              }
+                              if(this.related.length==0){
+                                  res["relatedDomains"]=[];
+                              }
+                              if(this.values.length==0){
+                                  res["exampleValues"]=[];
+                              }
+                              if(this.columns.length==0){
+                                  res["exampleColumns"]=[];
+                              }
+                              this.response = [res];
+                          }else{
+                              this.response =  this.response.concat(newvalue.response);
+                          }
+                          this._reset();
+                      }, 500);
     	          }
           },
           /* Initial filtering for filtering out the values whose assessment is 'NO' */
@@ -935,7 +961,11 @@ Note: The inputs marked with '*' are mandatory inputs.
     		    					}
 									if(notVerified.length > 0){
 										if(j>0){
-		                      			  this._paramVal = this._paramVal + " and " + "(";
+                                            if(this._paramVal!=""){
+                                                this._paramVal = this._paramVal + " and " + "(";
+                                            }else{
+                                                this._paramVal = this._paramVal + "(";
+                                            }
 		                      			}
 										this._paramVal = this._paramVal + this._paramsObj[keys[i]] + ' '+ "not ['" + notVerified.join("','")+ "']";
 									}
