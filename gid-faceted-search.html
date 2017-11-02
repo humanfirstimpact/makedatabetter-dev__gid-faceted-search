@@ -867,21 +867,38 @@ Note: The inputs marked with '*' are mandatory inputs.
           /* Add assessment and relevance field in response */
           _addRequiredFields:  function(obj, conceptdetails){
         		  var foundMatch = false;
+        		  for (var key in obj){
+              		obj[key] = _.uniqBy(obj[key], "id"); 
+              	  }
             	  for (var key in obj) {
            			for(var index=0; index<obj[key].length; index++){
            				foundMatch = false;
            				if(typeof(obj[key]) === "object"){
+           					if(key === "exampleColumns"){
+           						console.log(obj);
+           					}
            					if(this.triggerFilter){
            						obj[key][index]["assessment"] = 'M';
            					}
            					else{
            						if(conceptdetails[key].length > 0 ){
+           							var matchedIndex = '';
+           							var matchedAssessment = 'M';
+           							var matchedRelevance = '';
                						for(var i=0; i<conceptdetails[key].length; i++){
                    						if(typeof(conceptdetails[key]) === "object"){
             	       						if(obj[key][index]["id"] === conceptdetails[key][i]["id"]){
-            	       							obj[key][index]["assessment"] = conceptdetails[key][i]["assessment"];
-            	       							obj[key][index]["relevance"] = conceptdetails[key][i]["relevance"];
             	       							foundMatch = true;
+            	       							matchedAssessment = conceptdetails[key][i]["assessment"];
+            	       							matchedRelevance = conceptdetails[key][i]["relevance"]; 
+            	       							if(localStorage.getItem('debug')){
+	            	       							console.log(matchedIndex);
+	            	       							console.log(matchedAssessment);
+	            	       							console.log(matchedRelevance);
+	            	       							console.log(key);
+	            	       							console.log(obj[key][index]["id"]);
+	            	       							console.log(obj[key][index]["label"]);
+            	       							}
             	       							break;
             	       						}
             	       						else{
@@ -890,19 +907,29 @@ Note: The inputs marked with '*' are mandatory inputs.
                    						}
                    					}
                					}
-           						else{
-           							obj[key][index]["assessment"] = 'M';
+           						obj[key][index]["assessment"]  = matchedAssessment;
+           						if(localStorage.getItem('debug')){
+           							console.log("Assigning assessment");
+           							console.log(obj);
+           						}
+           						if(!_.isEmpty(matchedRelevance)){
+           							obj[key][index]["relevance"] = matchedRelevance;
+           							if(localStorage.getItem('debug')){
+               							console.log("Assigning relevance");
+               							console.log(obj);
+               						}
            						}
                					if(foundMatch){
-               						break;
+               						if(localStorage.getItem('debug')){
+               							console.log(obj);
+               						}
+               						continue;
                					}
            					}
            				}
            			}
            		}
-        	for (var key in obj){
-        		obj[key] = _.uniqBy(obj[key], "id"); 
-        	}
+        	
         	
         	return obj;
           },
@@ -1016,7 +1043,10 @@ Note: The inputs marked with '*' are mandatory inputs.
         				 }
                         }
         		  if(Polymer.globalsManager.get('initFilterParam')){
-        			  this._paramVal = this._paramVal + ' and ' + Polymer.globalsManager.get('initFilterParam'); 
+        			  if(this._paramVal){
+        				  this._paramVal =  this._paramVal + ' and ' + Polymer.globalsManager.get('initFilterParam'); 
+        			  }
+        			  this._paramVal = Polymer.globalsManager.get('initFilterParam'); 
         		  }
         		  else{
         			  this._paramVal = this._paramVal;
