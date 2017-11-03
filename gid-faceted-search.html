@@ -867,6 +867,9 @@ Note: The inputs marked with '*' are mandatory inputs.
           /* Add assessment and relevance field in response */
           _addRequiredFields:  function(obj, conceptdetails){
         		  var foundMatch = false;
+        		  var matchedIndex = '';
+				  var matchedAssessment = 'M';
+				  var matchedRelevance = '';
         		  for (var key in obj){
               		obj[key] = _.uniqBy(obj[key], "id"); 
               	  }
@@ -874,17 +877,11 @@ Note: The inputs marked with '*' are mandatory inputs.
            			for(var index=0; index<obj[key].length; index++){
            				foundMatch = false;
            				if(typeof(obj[key]) === "object"){
-           					if(key === "exampleColumns"){
-           						console.log(obj);
-           					}
            					if(this.triggerFilter){
            						obj[key][index]["assessment"] = 'M';
            					}
            					else{
            						if(conceptdetails[key].length > 0 ){
-           							var matchedIndex = '';
-           							var matchedAssessment = 'M';
-           							var matchedRelevance = '';
                						for(var i=0; i<conceptdetails[key].length; i++){
                    						if(typeof(conceptdetails[key]) === "object"){
             	       						if(obj[key][index]["id"] === conceptdetails[key][i]["id"]){
@@ -919,6 +916,7 @@ Note: The inputs marked with '*' are mandatory inputs.
                							console.log(obj);
                						}
            						}
+           						matchedAssessment = 'M';
                					if(foundMatch){
                						if(localStorage.getItem('debug')){
                							console.log(obj);
