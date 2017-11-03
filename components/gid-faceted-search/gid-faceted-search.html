@@ -758,6 +758,8 @@ Note: The inputs marked with '*' are mandatory inputs.
          _facetedSearchResponseReceived : function(newvalue, oldvalue){
         	 this.response = [];
         	 var conceptdetails = Polymer.globalsManager.get('conceptdetails');
+        	 var conceptDetailKeys = ["id", "label", "predictedColumns", "confirmedColumns", "coverage", "classificationAccuracyPercentage","eta","owner", "lobs"];
+      		 var conceptDetailObj = {};
  	          if(newvalue != null){
  		             this.async(function() {
  		            	var temp = {};
@@ -819,6 +821,14 @@ Note: The inputs marked with '*' are mandatory inputs.
  	 		            		}
  	 		            	}
                         }
+ 		            	else{
+ 		            			/* Setting concept related details */
+ 		            			for(var i=0; i<conceptDetailKeys.length; i++){
+ 		            				if(conceptdetails.hasOwnProperty(conceptDetailKeys[i])){
+ 		            					conceptDetailObj[conceptDetailKeys[i]] = conceptdetails[conceptDetailKeys[i]];
+ 		            				}
+ 		            			}
+ 		            	}
                          if(Polymer.globalsManager.get('_fetchClustersNear')){
                              //if cluster near do sort by descending
                              var sorted = {};
@@ -827,9 +837,11 @@ Note: The inputs marked with '*' are mandatory inputs.
                                      sorted[facetType] = _.sortBy(temp[facetType], ['relevance']).reverse();
                                  }
                              }
+                             _.merge(sorted, conceptDetailObj);
                              this.response =  this.response.concat(sorted);
                          }else{
                              //else sort is not needed
+                             _.merge(temp, conceptDetailObj);
                              this.response =  this.response.concat(temp);
                          }
 
