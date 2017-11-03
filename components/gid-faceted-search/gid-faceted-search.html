@@ -881,6 +881,9 @@ Note: The inputs marked with '*' are mandatory inputs.
            						obj[key][index]["assessment"] = 'M';
            					}
            					else{
+           						if(obj[key][index].hasOwnProperty("assessment")){
+       								matchedAssessment = obj[key][index]["assessment"];
+       							}
            						if(conceptdetails[key].length > 0 ){
                						for(var i=0; i<conceptdetails[key].length; i++){
                    						if(typeof(conceptdetails[key]) === "object"){
@@ -899,12 +902,12 @@ Note: The inputs marked with '*' are mandatory inputs.
             	       							break;
             	       						}
             	       						else{
-            	       							obj[key][index]["assessment"] = 'M';
+            	       							matchedAssessment = 'M';
             	       						}
                    						}
                    					}
                					}
-           						obj[key][index]["assessment"]  = matchedAssessment;
+           						obj[key][index]["assessment"] = matchedAssessment;
            						if(localStorage.getItem('debug')){
            							console.log("Assigning assessment");
            							console.log(obj);
