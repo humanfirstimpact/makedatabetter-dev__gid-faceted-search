@@ -8,7 +8,6 @@
 <link rel="import" href="../../paper-button-group/paper-button-group.html">
 <link rel="import" href="../../paper-styles/paper-styles.html">
 <link rel="import" href="../../gid-list-concepts/gid-list-concepts.html">
-
 <script src="../../jquery/dist/jquery.min.js"></script>
 
 <dom-module id="faceted-search">
@@ -115,7 +114,7 @@
         api-token={{apiToken}}
         synonyms='{{synonyms}}' patterns='{{patterns}}'
         related='{{related}}' values='{{values}}' columns='{{columns}}' mode="EXPLORE"
-        trigger-filter={{triggerFilter}}
+        trigger-filter={{triggerFilter}} search={{search}} search-value={{searchValue}} search-facet-type={{searchFacetType}}
         response={{response}}>
         </gid-faceted-search>
         
@@ -175,6 +174,9 @@
 					  </tr>
 					  <tr>
 					    <td valign="top">
+					     <p>
+					      <paper-input label="Search synonyms" id="Synonyms" on-input="_search"></paper-input>
+					     </p>
 					     <template is="dom-repeat" items="[[item.synonyms]]">
 					     	<p><paper-checkbox on-click="_check" name="synonyms" value="{{item.label}}">{{item.label}}</paper-checkbox>
 					     	<span>&nbsp;({{item.relevance}}%)</span>
@@ -189,6 +191,9 @@
 					     </template>
 					    </td>
 					    <td valign="top">
+					    <p>
+					    <paper-input label="Search patterns" id="Patterns"  on-input="_search"></paper-input>
+					    </p>
 					     <template is="dom-repeat" items="[[item.patterns]]">
 					     	<p><paper-checkbox on-click="_check" name="patterns" value="{{item.label}}">{{item.label}}</paper-checkbox>
 					     	<span>&nbsp;({{item.relevance}}%)</span>
@@ -203,6 +208,8 @@
 					     </template>
 					    </td>
 					    <td valign="top">
+					    <p><paper-input label="Search related concepts" id="Related Concepts"  on-input="_search"></paper-input>
+					      <iron-icon icon="icons:search"></iron-icon></p>
 					     <template is="dom-repeat" items="[[item.relatedDomains]]">
 					     	<p><paper-checkbox on-click="_check" name="related" value="{{item.label}}">{{item.label}}</paper-checkbox>
 					     	<span>&nbsp;({{item.relevance}}%)</span>
@@ -252,8 +259,8 @@
         <p></p>
         
          	<template is="dom-if" if="[[response.length]]">
-         	<h2>Faceted Search Result</h2>
-	         <template is="dom-repeat" items="[[_facetedSearchResult]]">
+         	<h2>Filtering Result</h2>
+	         <template is="dom-repeat" items="[[_facetedFilteringResult]]">
 	            <div class="horizontal-section">
 	                <table style="width:100%">
 					  <tr>
@@ -339,6 +346,36 @@
         	  <p>{{response.0.userMessage}}</p>
         	</template>
        </template>
+       
+       <template is="dom-if" if="[[response.length]]">
+         <h2>Search Result</h2>
+         <template is="dom-repeat" items="[[_facetedSearchResultArr]]">
+          <table style="width:100%">
+			  <tr>
+			    <th>Synonyms</th>
+			    <th>Patterns</th>
+			    <th>Related Concepts</th>
+			  </tr>
+			  <tr>
+			    <td valign="top">
+			     <template is="dom-repeat" items="[[item.synonyms]]">
+			      <p>{{item.label}}</p>
+			    </template>
+			    </td>
+			     <td valign="top">
+			       <template is="dom-repeat" items="[[item.patterns]]">
+			        <p>{{item.label}}</p>
+			      </template>
+			    </td>
+			    <td valign="top">
+			       <template is="dom-repeat" items="[[item.domains]]">
+			        <p>{{item.label}}</p>
+			      </template>
+			    </td>
+		      </tr>
+	     </table>
+          </template>
+       </template>
   </template>
   <script>
     (function() {
@@ -393,6 +430,11 @@
   	   	      value: [],
   	   	      notify: true
   	        },
+  	        _facetedSearchResultArr:{
+  	        	type: Array,
+   	   	      	value: [],
+    	   	    notify: true
+    	    },
   	        /*String for synonyms parameter*/ 
   	       synonyms: {
            	   type: String,
@@ -423,12 +465,13 @@
            	   notify: true,
            	   value: []
            },
-           _facetedSearchResult: {
+           _facetedFilteringResult: {
         	   type: Array,
            	   notify: true,
            	   value: []
            },
-           _facetedSearchPerformed: {
+           
+           _facetedFilteringPerformed: {
         	  type: Boolean,
    	   		  notify: true,
    	   		  value: false
@@ -472,6 +515,21 @@
             	type: Boolean,
                 notify: true,
                 value: false
+            },
+            searchValue: {
+         	   type: String,
+                notify: true,
+                value: ''
+            },
+            searchFacetType: {
+         	   type: String,
+                notify: true,
+                value: '' 
+            },
+            search: {
+         	   type: Boolean,
+   	           value: false,
+   	           notify: true
             }
 	           
         },
@@ -502,13 +560,19 @@
  					this._isResponseReceived = false;
  				}
  				else{
- 					if(!this._facetedSearchPerformed){
- 						this._facetedSearchPropertiesArr = this._facetedSearchPropertiesArr.concat(this.response);
+ 					if(this.search){
+ 						this._facetedSearchResultArr = this._facetedSearchResultArr.concat(this.response);
+ 						this.search = false;
  					}
  					else{
- 						this._facetedSearchResult = this._facetedSearchResult.concat(this.response);
- 	 	        	    this.triggerFilter =  false;
- 	 	        	    this._facetedSearchPerformed = false;
+ 						if(!this._facetedFilteringPerformed){
+ 	 						this._facetedSearchPropertiesArr = this._facetedSearchPropertiesArr.concat(this.response);
+ 	 					}
+ 	 					else{
+ 	 						this._facetedFilteringResult = this._facetedFilteringResult.concat(this.response);
+ 	 	 	        	    this.triggerFilter =  false;
+ 	 	 	        	    this._facetedFilteringPerformed = false;
+ 	 					}
  					}
  				}
          	 }
@@ -533,7 +597,7 @@
          },
          _reset: function(){
         	 this._facetedSearchPropertiesArr = [];
-        	 this._facetedSearchResult = [];
+        	 this._facetedFilteringResult = [];
         	 this.synonyms =  '';
         	 this.patterns = [];
         	 this.related = [];
@@ -545,13 +609,16 @@
         	 this.user = '';
         	 this.isConceptDetailsReceived = false;
         	 this._isResponseReceived = false;
-        	 this._facetedSearchPerformed = false;
+        	 this._facetedFilteringPerformed = false;
         	 this.concept = '';
         	 this._defineMode = false;
+        	 this.search =  false;
+        	 this.searchValue = '';
+        	 this.searchFacetType = '';
          },
          _check: function(event){
-        	 this._facetedSearchResult = [];
-        	 this._facetedSearchPerformed = true;
+        	 this._facetedFilteringResult = [];
+        	 this._facetedFilteringPerformed = true;
         	 this.triggerFilter = false;
         	 if(event.currentTarget.checked){
         		 if(event.currentTarget.name === 'synonyms'){
@@ -591,6 +658,18 @@
         	 else{
         		 this._defineMode = false;
         	 }
+         },
+         _search: function(event){
+        	 this._facetedSearchResultArr = [];
+        	 if(event.currentTarget.value){
+        		this.searchValue = event.currentTarget.value;
+             	this.searchFacetType = event.currentTarget.id;
+             	this.search = true; 
+        	 }
+        	 else{
+        		 this.search = false; 
+        	 }
+        	
          }
       });
     })();

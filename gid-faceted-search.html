@@ -10,8 +10,9 @@
 ## gid-faceted-search
 
 A data component for faceted search
-	<gid-faceted-search api-url ="<your-api-url>" api-token = "<your-api-token>"
-    user="<your-user-id>" concept="<concept-id>" trigger-faceted-search = true|false
+	<gid-faceted-search api-url="<your-api-url>" api-token="<your-api-token>"
+    user="<your-user-id>" concept="<concept-id>" trigger-filter=true|false 
+    search-value="<searched-value>" search-facet-type="Synonyms|Patterns|Related Concepts"
     mode="DEFINE|EXPLORE" response = {{response}}>
     </gid-faceted-search>
    
@@ -152,8 +153,8 @@ The output of this components will be as follows:
 
 
 	
-## Performing faceted search
-For performing faceted search, please follow the following steps:
+## Performing faceted filtering
+For performing faceted filtering, please follow the following steps:
 
 Scenario 1 : User checks on Country synonym:
 
@@ -398,7 +399,7 @@ Scenario 2 : User checks on Country synonym and checks a pattern 'Zzzz':
     
 Input:
  - User Id*
- - Mode*
+ - Mode
  - Synonyms
  - Patterns
 
@@ -445,6 +446,128 @@ The output of this components will be as follows:
     ],
     "relatedDomains": []
 }
+
+## Searching synonyms or patterns or related concepts
+For searching, please follow the following steps:
+
+Scenario 1 : User searches a synonym 'City':
+
+	<gid-faceted-search api-url ="<your-api-url>" api-token = "<your-api-token>"
+    user="<your-user-id>" search-value="City" search-facet-type="Synonyms"  search=true response = {{response}}>
+    </gid-faceted-search>
+    
+ - The user id needs to be provided in 'user' parameter.
+ - The 'api-url' needs to be provided to specify the rest end point.
+ - The 'api-token' would contain the access token to access the mentioned rest end point.
+ - The searched value is specified in the 'search-value' parameter.
+ - The facet type is specified in the 'search-facet-type' parameter. Possible values are Synonyms|Patterns|Related Concepts.
+ - To trigger the rest call for searching, the 'search' flag must be set to 'true'.
+ - The 'response' property would return the success/error response.
+ 
+
+    
+Input:
+ - User Id*
+ - Mode
+ - Searched Value
+ - Facet Type
+  
+Sample Input: (Query params)
+ GET /columns?filter=label co 'City'&showLabelsOnly=true
+
+Output:
+- Synonyms
+
+
+The output of this components will be as follows:
+
+	    {
+			    "synonyms": [
+		    {
+		        "id": "-9145617860147986575",
+		        "label": "CityName"
+		    },
+		    {
+		        "id": "6517649952213973882",
+		        "label": "CITY_NAME"
+		    },
+		    {
+		        "id": "6139631488560281627",
+		        "label": "City"
+		    },
+		    {
+		        "id": "6139631488560281627",
+		        "label": "CITY"
+		    },
+		    {
+		        "id": "-8984601159472564314",
+		        "label": "CUSTMR_CITY"
+		    },
+		    {
+		        "id": "-3828364467426411433",
+		        "label": "CITY_TOWN"
+		    },
+		    {
+		        "id": "-2926665638333170600",
+		        "label": "City Name"
+		    },
+		    {
+		        "id": "-3737328151570138659",
+		        "label": "store_city"
+		    },
+		    {
+		        "id": "4091553293280624104",
+		        "label": "customer_city"
+		    },
+		    {
+		        "id": "-5697281256097038564",
+		        "label": "ShipCity"
+		    },
+		    {
+		        "id": "4729928111753410716",
+		        "label": "REG_CITY"
+		    }
+		]
+	}
+	
+Scenario 2 : User searches a pattern 'ZZZZZ-Z':
+
+	<gid-faceted-search api-url ="<your-api-url>" api-token = "<your-api-token>"
+    user="<your-user-id>" search-value="ZZZZZ-Z" search-facet-type="Patterns"  search=true response = {{response}}>
+    </gid-faceted-search>
+    
+ - The user id needs to be provided in 'user' parameter.
+ - The 'api-url' needs to be provided to specify the rest end point.
+ - The 'api-token' would contain the access token to access the mentioned rest end point.
+ - The searched value is specified in the 'search-value' parameter.
+ - The facet type is specified in the 'search-facet-type' parameter. Possible values are Synonyms|Patterns|Related Concepts.
+ - To trigger the rest call for searching, the 'search' flag must be set to 'true'.
+ - The 'response' property would return the success/error response.
+ 
+
+    
+Input:
+ - User Id*
+ - Mode
+ - Searched Value
+ - Facet Type
+  
+Sample Input: (Query params)
+ GET /patterns?filter=label eq 'ZZZZZ-Z'
+
+Output:
+- Patterns
+
+
+The output of this components will be as follows:
+
+	    {
+	    "patterns": [{
+		    "id": "516991293232198988",
+		    "label": "ZZZZZ-Z"
+		}]
+	}
+
 
 If 'apiUrl' is not provided, then the component would fetch sample data from mock json.
 
@@ -493,20 +616,83 @@ Note: The inputs marked with '*' are mandatory inputs.
 	   	          value : '',
 	   	          notify :  true
 	 	       },
-              /*Object listing the various parameters*/
-              _paramsObj: {
+	 	      _paramVal:{
+	 	    	 type: String,
+	   	         value : '',
+	   	         notify :  true 
+	 	      },
+              /*Array listing the various parameters and properties*/
+              _paramsArr: {
         	       type: Array,
 	           	   notify: true,
-	           	   value: {
-		           		"synonyms" : "synonyms",
-		           		"patterns"	: "patterns",
-		           		"relatedDomains" : "related",
-		           		"related" : "related",
-		           		"exampleValues" : "values",
-		           		"values" : "values",
-		           		"exampleColumns" : "columns",
-		           		"columns" : "columns"
-	           	   }
+	           	   value:  [{
+		           	 	"name": "synonyms",
+		           	 	"map": "synonyms",
+		           	 	"isParam": "Y",
+		           	 	"isProp": "Y"
+		           	 }, {
+		           	 	"name": "patterns",
+		           	 	"map": "patterns",
+		           	 	"isParam": "Y",
+		           	 	"isProp": "Y"
+		           	 }, {
+		           	 	"name": "relatedDomains",
+		           	 	"map": "related",
+		           	 	"isParam": "Y",
+		           	 	"isProp": "N"
+		           	 }, {
+		           	 	"name": "related",
+		           	 	"map": "related",
+		           	 	"isParam": "N",
+		           	 	"isProp": "Y"
+		           	 }, {
+		           	 	"name": "exampleValues",
+		           	 	"map": "values",
+		           	 	"isParam": "Y",
+		           	 	"isProp": "N"
+		           	 }, {
+		           	 	"name": "values",
+		           	 	"map": "values",
+		           	 	"isParam": "N",
+		           	 	"isProp": "Y"
+		           	 }, {
+		           	 	"name": "exampleColumns",
+		           	 	"map": "columns",
+		           	 	"isParam": "Y",
+		           	 	"isProp": "N"
+		           	 }, {
+		           	 	"name": "columns",
+		           	 	"map": "columns",
+		           	 	"isParam": "N",
+		           	 	"isProp": "Y"
+	           	 }]
+              },
+              /*Array listing the various search parameters*/
+              _searchParamsArr: {
+            	  type: Array,
+            	  notify:  true,
+            	  value:[{
+            			"type": "synonyms",
+            			"map": "synonyms",
+            			"apiEntity": "SEARCH-SYNONYMS"
+            		},
+            		{
+            			"type": "patterns",
+            			"map": "patterns",
+            			"apiEntity": "SEARCH-PATTERNS"
+            		},
+            		{
+            			"type": "related concepts",
+            			"map": "relatedDomains",
+            			"apiEntity": "SEARCH-RELATED-DOMAINS"
+            		}
+            	]
+              },
+              /*Keys of concept details object*/
+              conceptDetailKeys: {
+            	  type: Array,
+	           	  notify: true,
+	           	  value:  ["id", "label", "predictedColumns", "confirmedColumns", "coverage", "classificationAccuracyPercentage","eta","owner", "lobs"]
               },
               /*Mode can either be 'EXPLORE' or 'DEFINE'. The default mode is 'EXPLORE'*/
               mode: {
@@ -655,18 +841,37 @@ Note: The inputs marked with '*' are mandatory inputs.
                _paramVal: {
             	   type: String,
                    notify: true,
-                   value: '',
+                   value: ''
+               },
+               /*Value that is searched*/
+               searchValue: {
+            	   type: String,
+                   notify: true,
+                   value: ''
+               },
+               /*Facet type that is searched. Possible values are 'Synonyms', 'Patterns' and 'Related Concepts*/
+               searchFacetType: {
+            	   type: String,
+                   notify: true,
+                   value: '' 
+               },
+               /*Triggers search*/
+               search: {
+            	   type: Boolean,
+	   	           value: false,
+	   	           notify: true,
+	   	           observer: '_observeSearchFlag'
                }
-        },
-        
-        ready: function (){
-        	
+               
         },
         
          /* Reset method */
          _reset: function () {
         	// this.conceptdetails = [];
         	 this.triggerFilter = false;
+        	 this.search =  false;
+        	 this.searchValue = '';
+        	 this.searchFacetType = '';
         	 this._paramVal = '';
       		 this._apiEntity = '';
              this._path = '';
@@ -703,11 +908,20 @@ Note: The inputs marked with '*' are mandatory inputs.
         	 this._apiEntity = '';
              this._path = '';
         	 this._pathKey =  'default';
-        	 if(Polymer.globalsManager.get('_fetchClustersNear')){
-        		 this._apiEntity = 'CLUSTERS';
+        	 if(this.search){
+        		 for (var i in this._searchParamsArr){
+        			 if(this.searchFacetType.toLowerCase() === this._searchParamsArr[i].type){
+        				 this._apiEntity = this._searchParamsArr[i].apiEntity;
+        			 }
+        		 }
         	 }
-        	 else  if(Polymer.globalsManager.get('_fetchColumnsNear')){
-        		 this._apiEntity = 'FACETED-COLUMNS';
+        	 else{
+        		 if(Polymer.globalsManager.get('_fetchClustersNear')){
+            		 this._apiEntity = 'CLUSTERS';
+            	 }
+            	 else  if(Polymer.globalsManager.get('_fetchColumnsNear')){
+            		 this._apiEntity = 'FACETED-COLUMNS';
+            	 }
         	 }
         	 
          },
@@ -724,55 +938,67 @@ Note: The inputs marked with '*' are mandatory inputs.
          		}
        			this._facetedSearchUrl = this.apiUrl + res.join("");
        			var obj = {};
-       			if(Polymer.globalsManager.get('_fetchColumnsNear')){
+       			if(this.search){
        				if(this._paramVal){
-       					obj["near"] = Polymer.globalsManager.get('_conceptLabel');
        					obj["filter"] = this._paramVal;
-       				}
-       				else{
-       					obj["near"] = Polymer.globalsManager.get('_conceptLabel');
+       					if(this.searchFacetType.toLowerCase() === "synonyms"){
+       						obj["showLabelsOnly"] = true;
+       					}
        				}
        			}
-       			else if(Polymer.globalsManager.get('_fetchClustersNear')){
-       		//		this._facetedSearchUrl = this.importPath + 'assets/json/clusters.json';
-       				if(this._paramVal){
-       					obj["near"] = Polymer.globalsManager.get('_conceptId');
-       					obj["filter"] = this._paramVal;
-       				}
-       				else{
-       					obj["near"] = Polymer.globalsManager.get('_conceptId');
-       				}
+       			else{
+       				if(Polymer.globalsManager.get('_fetchColumnsNear')){
+           				if(this._paramVal){
+           					obj["near"] = Polymer.globalsManager.get('_conceptLabel');
+           					obj["filter"] = this._paramVal;
+           				}
+           				else{
+           					obj["near"] = Polymer.globalsManager.get('_conceptLabel');
+           				}
+           			}
+           			else if(Polymer.globalsManager.get('_fetchClustersNear')){
+           		//		this._facetedSearchUrl = this.importPath + 'assets/json/clusters.json';
+           				if(this._paramVal){
+           					obj["near"] = Polymer.globalsManager.get('_conceptId');
+           					obj["filter"] = this._paramVal;
+           				}
+           				else{
+           					obj["near"] = Polymer.globalsManager.get('_conceptId');
+           				}
+           			}
        			}
        			this._facetedSearchParams = JSON.stringify(obj);
    				this._setAttributes();
+   				
          	}
          },
          /* Set timeout and token */
          _setAttributes: function(){
         	 if(this.apiToken){
-    				this._facetedSearchToken =  this.apiToken;
-    			}
-    			this._facetedSearchTimeout =  this._facetedSearchTimeout - 1;
+   				this._facetedSearchToken =  this.apiToken;
+   			}
+   			this._facetedSearchTimeout =  this._facetedSearchTimeout - 1;
          },
          /* Success response handler */
          _facetedSearchResponseReceived : function(newvalue, oldvalue){
         	 this.response = [];
         	 var conceptdetails = Polymer.globalsManager.get('conceptdetails');
-        	 var conceptDetailKeys = ["id", "label", "predictedColumns", "confirmedColumns", "coverage", "classificationAccuracyPercentage","eta","owner", "lobs"];
       		 var conceptDetailObj = {};
  	          if(newvalue != null){
- 		             this.async(function() {
+	             this.async(function() {
+	            	 if(this.search){
+	            		 this.response =  this.response.concat(newvalue);
+	            	 }
+ 		             else{
  		            	var temp = {};
- 		            	var keys = ["synonyms", "patterns", "relatedDomains", "exampleValues", "exampleColumns"];
  		            	var clusterdCols = [];
  		            	var exmplColArr = [];
- 		            	for(var idx=0; idx<keys.length; idx++){
- 		            		temp[keys[idx]] = [];
- 		            	}
+ 		            	temp = this._constructTemporaryObject(temp);
  		            	if(Polymer.globalsManager.get('_fetchClustersNear')){
 	            			if(newvalue.hasOwnProperty("synonyms")){
 	            				temp["synonyms"] = newvalue["synonyms"];
  		            		}
+	            			/* Assigning properties to 'temp' object */
  		            		for(var i = 0; i<newvalue["clusters"].length; i++){
  		            			clusterdCols = newvalue["clusters"][i]["columns"];
  		            			for(var j=0; j<clusterdCols.length; j++){
@@ -803,29 +1029,13 @@ Note: The inputs marked with '*' are mandatory inputs.
  		            	}
  		            	temp = this._addRequiredFields(temp, conceptdetails);
  		            	if(this.triggerFilter){
- 		            		 var arr  = [];
- 		      			  	 for(var a in this._paramsObj){
- 		      				  arr = arr.concat(this._paramsObj[a]); 
- 		              		}
- 		      			  	for(var k in arr){
- 	 		            		if(!_.isEmpty(this[arr[k]])){
- 	 		            			$.each(this._paramsObj, function (inx, val) {
- 	 		            			    if (val === arr[k]) {
- 	 		            			    	if(temp.hasOwnProperty(inx)){
- 	 		            			    		delete temp[inx];
- 	 		            			    	}
- 	 		            			    }
-
- 	 		            			})
- 	 		            			
- 	 		            		}
- 	 		            	}
+ 		      			   temp = this._delProps(temp);
                         }
  		            	else{
  		            			/* Setting concept related details */
- 		            			for(var i=0; i<conceptDetailKeys.length; i++){
- 		            				if(conceptdetails.hasOwnProperty(conceptDetailKeys[i])){
- 		            					conceptDetailObj[conceptDetailKeys[i]] = conceptdetails[conceptDetailKeys[i]];
+ 		            			for(var i=0; i<this.conceptDetailKeys.length; i++){
+ 		            				if(conceptdetails.hasOwnProperty(this.conceptDetailKeys[i])){
+ 		            					conceptDetailObj[this.conceptDetailKeys[i]] = conceptdetails[this.conceptDetailKeys[i]];
  		            				}
  		            			}
  		            	}
@@ -847,12 +1057,37 @@ Note: The inputs marked with '*' are mandatory inputs.
 
 		                if(localStorage.getItem('debug')){
 		                	console.log("final response = " + JSON.stringify(this.response));
-		                }
- 		         		this._reset();
- 		   		 	          }, 500);
+		                } 
+ 		             }
+ 		            	
+	         		this._reset();
+	   		 	          }, 500);
  	          }
           	
           },
+          /* Construct temporary object */
+          _constructTemporaryObject: function(temp){
+        	  for (var idx in this._paramsArr){
+	            	if(this._paramsArr[idx].isParam === 'Y'){
+	            		temp[this._paramsArr[idx].name] = [];
+	            	}
+           	}
+        	  
+        	 return temp; 
+          },          
+          /* When filtering, remove all object (i.e synonyms, patterns etc.) from final response which are selected.
+          Eg. if any 'pattern' is selected, final response shouldn't contain 'pattern' property in object */
+          _delProps: function(temp){
+        	  for (var k in this._paramsArr){
+            		if(!_.isEmpty(this[this._paramsArr[k].map])){
+	  			    	if(temp.hasOwnProperty(this._paramsArr[k].name)){
+	  			    		delete temp[this._paramsArr[k].name];
+	  			    	}
+            		}
+            	} 
+        	  return temp; 
+          },         
+          
           /* Adding example columns to response */
           _addExampleColumns:  function(clusterdCols, exmplColArr, counter){
         	  exmplColArr.push({
@@ -903,14 +1138,6 @@ Note: The inputs marked with '*' are mandatory inputs.
             	       							foundMatch = true;
             	       							matchedAssessment = conceptdetails[key][i]["assessment"];
             	       							matchedRelevance = conceptdetails[key][i]["relevance"]; 
-            	       							if(localStorage.getItem('debug')){
-	            	       							console.log(matchedIndex);
-	            	       							console.log(matchedAssessment);
-	            	       							console.log(matchedRelevance);
-	            	       							console.log(key);
-	            	       							console.log(obj[key][index]["id"]);
-	            	       							console.log(obj[key][index]["label"]);
-            	       							}
             	       							break;
             	       						}
             	       						else{
@@ -920,16 +1147,8 @@ Note: The inputs marked with '*' are mandatory inputs.
                    					}
                					}
            						obj[key][index]["assessment"] = matchedAssessment;
-           						if(localStorage.getItem('debug')){
-           							console.log("Assigning assessment");
-           							console.log(obj);
-           						}
            						if(!_.isEmpty(matchedRelevance)){
            							obj[key][index]["relevance"] = matchedRelevance;
-           							if(localStorage.getItem('debug')){
-               							console.log("Assigning relevance");
-               							console.log(obj);
-               						}
            						}
            						matchedAssessment = 'M';
                					if(foundMatch){
@@ -951,25 +1170,31 @@ Note: The inputs marked with '*' are mandatory inputs.
         	  this.response = [];
     	          if(newvalue != null){
                       this.async(function () {
-                          if(newvalue.status==404){
-                              var res={};
-                              if(this.synonyms==""){
-                                  res["synonyms"]=[];
-                              }
-                              if(this.patterns.length==0){
-                                  res["patterns"]=[];
-                              }
-                              if(this.related.length==0){
-                                  res["relatedDomains"]=[];
-                              }
-                              if(this.values.length==0){
-                                  res["exampleValues"]=[];
-                              }
-                              if(this.columns.length==0){
-                                  res["exampleColumns"]=[];
-                              }
-                              this.response = [res];
-                          }else{
+                    	  if(Polymer.globalsManager.get('_fetchClustersNear')){
+                    		  if(!this.triggerFilter){
+                    			  Polymer.globalsManager.set('_fetchClustersNear', false);
+                        		  Polymer.globalsManager.set('_fetchColumnsNear', true);
+                       			  this._initFilter(); 
+                    		  }
+                    		  else{
+                    			  var temp = {};
+                    			  temp = this._constructTemporaryObject(temp);
+                    			  temp = this._delProps(temp);
+                    			  _.merge(temp, newvalue.response);
+                    			  this.response = this.response.concat(temp);
+                    		  }
+                    		  
+                    	  }
+                    	  else if(Polymer.globalsManager.get('_fetchColumnsNear')){
+                    		  var temp = {};
+         		              temp = this._constructTemporaryObject(temp);
+                    		  if(this.triggerFilter){
+                    			  temp = this._delProps(temp);
+                    		  }
+                    		  _.merge(temp, newvalue.response);
+       		            	this.response = this.response.concat(temp);
+                    	  }
+                    	  else{
                               this.response =  this.response.concat(newvalue.response);
                           }
                           this._reset();
@@ -980,21 +1205,18 @@ Note: The inputs marked with '*' are mandatory inputs.
           _initFilter: function(){
         	  this._paramVal = '';
     		  var j = 0;
-    		  var keys  = [];
-			  for(var key in this._paramsObj){
-				  keys = keys.concat(key); 
-        		}
-			  for (var i in keys){
-  				if(this.conceptdetails[0].hasOwnProperty(keys[i])){
-                		if(this.conceptdetails[0][keys[i]].length > 0){
+
+			  for (var i in this._paramsArr){
+  				if(this.conceptdetails[0].hasOwnProperty(this._paramsArr[i].name)){
+                		if(this.conceptdetails[0][this._paramsArr[i].name].length > 0){
 				        	    	var notVerified = [];
-									for(var index in this.conceptdetails[0][keys[i]]){
-										if(this.conceptdetails[0][keys[i]][index]["assessment"] === 'N'){
-											if(keys[i] === "exampleColumns"){
-												notVerified = notVerified.concat(this.conceptdetails[0][keys[i]][index]["id"]);
+									for(var index in this.conceptdetails[0][this._paramsArr[i].name]){
+										if(this.conceptdetails[0][this._paramsArr[i].name][index]["assessment"] === 'N'){
+											if(this._paramsArr[i].name === "exampleColumns"){
+												notVerified = notVerified.concat(this.conceptdetails[0][this._paramsArr[i].name][index]["id"]);
 											}
 											else{
-												notVerified = notVerified.concat(this.conceptdetails[0][keys[i]][index]["label"]);
+												notVerified = notVerified.concat(this.conceptdetails[0][this._paramsArr[i].name][index]["label"]);
 											}
 										}
     		    					
@@ -1007,7 +1229,7 @@ Note: The inputs marked with '*' are mandatory inputs.
                                                 this._paramVal = this._paramVal + "(";
                                             }
 		                      			}
-										this._paramVal = this._paramVal + this._paramsObj[keys[i]] + ' '+ "not ['" + notVerified.join("','")+ "']";
+										this._paramVal = this._paramVal + this._paramsArr[i].map + ' '+ "not ['" + notVerified.join("','")+ "']";
 									}
     		    			if(j>0 && notVerified.length > 0){
     		    				this._paramVal = this._paramVal + ')';
@@ -1020,32 +1242,28 @@ Note: The inputs marked with '*' are mandatory inputs.
 			  Polymer.globalsManager.set('initFilterParam',this._paramVal);
 			  this._set();
           },
-          /*Observer of 'triggerFilter' flag*/
+          /*Observer of 'triggerFilter' flag and faceted filtering handler*/
           _observeTriggerFilter:  function(){
         	  if(this.triggerFilter){
         		  this._paramVal = '';
         		  var j = 0;
-        		  var keys  = [];
-    			  for(var key in this._paramsObj){
-    				  keys = keys.concat(key); 
-            		}
-        			  for (var i in keys){
-        				 if(this[keys[i]]){
-                        	if(this[keys[i]].length > 0){
+        			  for (var i in this._paramsArr){
+        				 if(this[this._paramsArr[i].name]){
+                        	if(this[this._paramsArr[i].name].length > 0){
                         			if(j>0){
                         				this._paramVal = this._paramVal + " and " + "(";
                         			}
-                		    		if(keys[i] === "synonyms"){
+                		    		if(this._paramsArr[i].name === "synonyms"){
                 		    			this._paramVal = this._paramVal + "label ";
             		    			}
             		    			else{
-            		    				this._paramVal = this._paramVal + this._paramsObj[keys[i]] + ' ';
+            		    				this._paramVal = this._paramVal + this._paramsArr[i].map + ' ';
             		    			}
-            		    			if(typeof(this[this._paramsObj[keys[i]]]) === "string"){
-            		    				this._paramVal = this._paramVal + "eq '"+ this[this._paramsObj[keys[i]]] + "'";
+            		    			if(typeof(this[this._paramsArr[i].name]) === "string"){
+            		    				this._paramVal = this._paramVal + "eq '"+ this[this._paramsArr[i].map] + "'";
             		    			}      		    				
             		    			else{
-           		    					this._paramVal = this._paramVal + "every ['" + this[this._paramsObj[keys[i]]].join("','")+ "']";
+           		    					this._paramVal = this._paramVal + "every ['" + this[this._paramsArr[i].map].join("','")+ "']";
             		    			}
             		    			if(j>0){
             		    				this._paramVal = this._paramVal + ')';
@@ -1059,7 +1277,9 @@ Note: The inputs marked with '*' are mandatory inputs.
         			  if(this._paramVal){
         				  this._paramVal =  this._paramVal + ' and ' + Polymer.globalsManager.get('initFilterParam'); 
         			  }
-        			  this._paramVal = Polymer.globalsManager.get('initFilterParam'); 
+        			  else{
+        				  this._paramVal = Polymer.globalsManager.get('initFilterParam'); 
+        			  }
         		  }
         		  else{
         			  this._paramVal = this._paramVal;
@@ -1068,6 +1288,23 @@ Note: The inputs marked with '*' are mandatory inputs.
                   this._set();
         	  }
         	 
+          },
+          /*Observer of 'search' flag and search functionality handler*/
+          _observeSearchFlag: function(){
+        	  this._paramVal = '';
+        	  if(this.search && this.searchValue){
+        		  for (var i in this._searchParamsArr){
+         			 if(this.searchFacetType.toLowerCase() === this._searchParamsArr[i].type){
+	        			  if(this.searchFacetType.toLowerCase()  === "patterns"){
+	        				  this._paramVal = this._paramVal + "label eq '"+ this.searchValue + "'";
+	        			  }
+	        			  else{
+	        				  this._paramVal = this._paramVal + "label co '"+ this.searchValue + "'";
+	        			  }
+         			 }
+       			 }
+        			  this._set();
+       		  }
           }
       });
     })();
