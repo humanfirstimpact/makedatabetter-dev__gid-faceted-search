@@ -1254,16 +1254,10 @@ Note: The inputs marked with '*' are mandatory inputs.
                         				this._paramVal = this._paramVal + " and " + "(";
                         			}
                 		    		if(this._paramsArr[i].name === "synonyms"){
-                		    			this._paramVal = this._paramVal + "label ";
+                		    			this._paramVal = this._paramVal + "label eq '"+ this[this._paramsArr[i].map] + "'";
             		    			}
             		    			else{
-            		    				this._paramVal = this._paramVal + this._paramsArr[i].map + ' ';
-            		    			}
-            		    			if(typeof(this[this._paramsArr[i].name]) === "string"){
-            		    				this._paramVal = this._paramVal + "eq '"+ this[this._paramsArr[i].map] + "'";
-            		    			}      		    				
-            		    			else{
-           		    					this._paramVal = this._paramVal + "every ['" + this[this._paramsArr[i].map].join("','")+ "']";
+            		    				this._paramVal = this._paramVal + this._paramsArr[i].map + " every ['" + this[this._paramsArr[i].map].join("','")+ "']";
             		    			}
             		    			if(j>0){
             		    				this._paramVal = this._paramVal + ')';
