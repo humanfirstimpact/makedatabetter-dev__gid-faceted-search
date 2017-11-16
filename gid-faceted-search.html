@@ -404,7 +404,7 @@ Input:
  - Patterns
 
 Sample Input: (Query params)
- GET /columns?filter="label eq 'Country' and (patterns every ['Zzzz’])"
+ GET /columns?filter="label eq 'Country' and (patterns every ['Zzzzï¿½])"
 
 Output:
 - Related Domains
@@ -879,15 +879,17 @@ Note: The inputs marked with '*' are mandatory inputs.
          
          /* Observer of concept details array */
          _conceptDetailsArrObserver: function () {
+
         	 var that = this;
         	 Polymer.globalsManager.set('_fetchColumnsNear', false);
         	 Polymer.globalsManager.set('_fetchClustersNear', false);
         	 if (this.conceptdetails.length > 0) {
         		 Polymer.globalsManager.set('conceptdetails',  this.conceptdetails[0]);
-        		 this.conceptdetails.forEach( function(i) { 
+        		 this.conceptdetails.forEach( function(i) {
         			 Polymer.globalsManager.set('_conceptLabel', i.label);
         			 Polymer.globalsManager.set('_conceptId', i.id);
-        			 if(i.exampleColumns.length === 0){
+        			if(i.exampleColumns.length === 0){
+
         				 if (!that.apiUrl) {
         					 //TODO
                			}
@@ -896,11 +898,12 @@ Note: The inputs marked with '*' are mandatory inputs.
                  			that._initFilter();
                   		}
         			 }
-        			 else{
+        			else{
         				 Polymer.globalsManager.set('_fetchClustersNear', true);
         				 that._initFilter();
         			 }
-        		} );
+        		}
+        		);
          	}
          },
          /* Set pathkey  and entity for faceted column search */
@@ -927,6 +930,7 @@ Note: The inputs marked with '*' are mandatory inputs.
          },
          /* Observer for api path */
          _pathReceived: function(){
+
          	if(this._path){
          		var res = this._path.split(/{([^}]+)}/);
          		for (var i in res) {
@@ -947,9 +951,9 @@ Note: The inputs marked with '*' are mandatory inputs.
        				}
        			}
        			else{
+
        				if(Polymer.globalsManager.get('_fetchColumnsNear')){
            				if(this._paramVal){
-           					obj["near"] = Polymer.globalsManager.get('_conceptLabel');
            					obj["filter"] = this._paramVal;
            				}
            				else{
@@ -1223,7 +1227,7 @@ Note: The inputs marked with '*' are mandatory inputs.
     		    					}
 									if(notVerified.length > 0){
 										if(j>0){
-                                            if(this._paramVal!=""){
+                                              if(this._paramVal!=""){
                                                 this._paramVal = this._paramVal + " and " + "(";
                                             }else{
                                                 this._paramVal = this._paramVal + "(";
@@ -1244,7 +1248,10 @@ Note: The inputs marked with '*' are mandatory inputs.
           },
           /*Observer of 'triggerFilter' flag and faceted filtering handler*/
           _observeTriggerFilter:  function(){
+			Polymer.globalsManager.set('_fetchClustersNear', false);
+			Polymer.globalsManager.set('_fetchColumnsNear', false);
         	  if(this.triggerFilter){
+        	  	Polymer.globalsManager.set('_fetchColumnsNear', true);
         		  this._paramVal = '';
         		  var j = 0;
         			  for (var i in this._paramsArr){
