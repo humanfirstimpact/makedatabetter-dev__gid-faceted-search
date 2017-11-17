@@ -883,6 +883,8 @@ Note: The inputs marked with '*' are mandatory inputs.
         	 var that = this;
         	 Polymer.globalsManager.set('_fetchColumnsNear', false);
         	 Polymer.globalsManager.set('_fetchClustersNear', false);
+        	 Polymer.globalsManager.set('_initColumns', false);
+        	 Polymer.globalsManager.set('_initClusters', false);
         	 if (this.conceptdetails.length > 0) {
         		 Polymer.globalsManager.set('conceptdetails',  this.conceptdetails[0]);
         		 this.conceptdetails.forEach( function(i) {
@@ -895,11 +897,13 @@ Note: The inputs marked with '*' are mandatory inputs.
                			}
                  		else {
                  			Polymer.globalsManager.set('_fetchColumnsNear', true);
+                 			Polymer.globalsManager.set('_initColumns', true);
                  			that._initFilter();
                   		}
         			 }
         			else{
         				 Polymer.globalsManager.set('_fetchClustersNear', true);
+        				 Polymer.globalsManager.set('_initClusters', true);
         				 that._initFilter();
         			 }
         		}
@@ -923,6 +927,14 @@ Note: The inputs marked with '*' are mandatory inputs.
             		 this._apiEntity = 'CLUSTERS';
             	 }
             	 else  if(Polymer.globalsManager.get('_fetchColumnsNear')){
+            		 this._apiEntity = 'FACETED-COLUMNS';
+            	 }
+            	 else if(Polymer.globalsManager.get('_initClusters')){
+            		 Polymer.globalsManager.set('_fetchClustersNear', true);
+            		 this._apiEntity = 'CLUSTERS';
+            	 }
+            	 else if(Polymer.globalsManager.get('_initColumns')){
+            		 Polymer.globalsManager.set('_fetchColumnsNear', true);
             		 this._apiEntity = 'FACETED-COLUMNS';
             	 }
         	 }
@@ -1251,7 +1263,6 @@ Note: The inputs marked with '*' are mandatory inputs.
 			Polymer.globalsManager.set('_fetchClustersNear', false);
 			Polymer.globalsManager.set('_fetchColumnsNear', false);
         	  if(this.triggerFilter){
-        	  	Polymer.globalsManager.set('_fetchColumnsNear', true);
         		  this._paramVal = '';
         		  var j = 0;
         			  for (var i in this._paramsArr){
@@ -1285,7 +1296,9 @@ Note: The inputs marked with '*' are mandatory inputs.
         		  else{
         			  this._paramVal = this._paramVal;
         		  }
-        		  
+        		  if(this._paramVal){
+        			  Polymer.globalsManager.set('_fetchColumnsNear', true);
+        		  }
                   this._set();
         	  }
         	 
