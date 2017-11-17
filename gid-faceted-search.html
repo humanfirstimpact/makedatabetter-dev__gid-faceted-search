@@ -1288,6 +1288,7 @@ Note: The inputs marked with '*' are mandatory inputs.
         		  if(Polymer.globalsManager.get('initFilterParam')){
         			  if(this._paramVal){
         				  this._paramVal =  this._paramVal + ' and ' + Polymer.globalsManager.get('initFilterParam'); 
+        				  Polymer.globalsManager.set('_fetchColumnsNear', true);
         			  }
         			  else{
         				  this._paramVal = Polymer.globalsManager.get('initFilterParam'); 
@@ -1295,9 +1296,9 @@ Note: The inputs marked with '*' are mandatory inputs.
         		  }
         		  else{
         			  this._paramVal = this._paramVal;
-        		  }
-        		  if(this._paramVal){
-        			  Polymer.globalsManager.set('_fetchColumnsNear', true);
+        			  if(this._paramVal){
+        				  Polymer.globalsManager.set('_fetchColumnsNear', true);
+        			  }
         		  }
                   this._set();
         	  }
