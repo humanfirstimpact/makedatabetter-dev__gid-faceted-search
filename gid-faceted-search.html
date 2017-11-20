@@ -930,10 +930,12 @@ Note: The inputs marked with '*' are mandatory inputs.
             		 this._apiEntity = 'FACETED-COLUMNS';
             	 }
             	 else if(Polymer.globalsManager.get('_initClusters')){
+            		 this.triggerFilter = false;
             		 Polymer.globalsManager.set('_fetchClustersNear', true);
             		 this._apiEntity = 'CLUSTERS';
             	 }
             	 else if(Polymer.globalsManager.get('_initColumns')){
+            		 this.triggerFilter = false;
             		 Polymer.globalsManager.set('_fetchColumnsNear', true);
             		 this._apiEntity = 'FACETED-COLUMNS';
             	 }
